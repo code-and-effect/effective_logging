@@ -1,0 +1,7 @@
+%h2 Logs
+
+- unless @datatable.collection.length > 0
+  %p
+    There are no logs
+- else
+  = render_datatable @datatable
