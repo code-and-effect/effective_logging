@@ -6,7 +6,10 @@ module EffectiveLogging
   mattr_accessor :logs_table_name
   mattr_accessor :authorization_method
   mattr_accessor :layout
-  mattr_accessor :statuses
+  mattr_accessor :additional_statuses
+
+  mattr_accessor :emails_enabled
+  mattr_accessor :user_logins_enabled
 
   def self.setup
     yield self
@@ -18,7 +21,7 @@ module EffectiveLogging
   end
 
   def self.statuses
-    @statuses ||= Array(@@statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error']
+    @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
   end
 
 end
