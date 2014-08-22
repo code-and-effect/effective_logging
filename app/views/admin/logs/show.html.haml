@@ -1,7 +1,10 @@
-%h2 Log
+%h2= @page_title
 
 .panel{:class => "panel-#{bootstrap_class_for_status(@log.status)}"}
   .panel-heading
+    - parents_of_log(@log).each do |log|
+      = link_to(log.message, effective_logging.admin_log_path(log))
+      = ' > '
     %strong= @log.message
 
   .panel-body
@@ -19,7 +22,7 @@
           = @log.user
           - links = [effective_logging_object_link_to(@log.user, :show), effective_logging_object_link_to(@log.user, :edit)].compact
           - if links.present?
-            = "(#{links.join(' -')})".html_safe
+            = "(#{links.join(' - ')})".html_safe
       .col-lg-4
         - if @log.associated.present?
           %strong Regarding:
@@ -36,3 +39,15 @@
           %p
             %strong Details:
           = simple_format(@log.details)
+
+    - if @log.logs.present?
+      .row
+        .col-lg-12
+          %br
+          %p
+            %strong Additional Entries:
+            = "this log contains #{@log.logs_count} additional sub entries"
+      %hr
+      .row
+        .col-lg-12= render_datatable @datatable
+

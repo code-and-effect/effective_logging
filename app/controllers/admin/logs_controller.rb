@@ -12,7 +12,13 @@ module Admin
     end
 
     def show
-      @log = Effective::Log.find(params[:id])
+      @log = Effective::Log.includes(:logs).find(params[:id])
+      @page_title = "Log ##{@log.to_param}"
+
+      if @log.logs.present?
+        @datatable = Effective::Datatables::Logs.new(:log_id => @log.id) if defined?(EffectiveDatatables)
+      end
+
       EffectiveLogging.authorized?(self, :show, @log)
     end
   end

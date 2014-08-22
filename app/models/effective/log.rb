@@ -25,7 +25,7 @@ module Effective
     default_scope -> { order("#{EffectiveLogging.logs_table_name.to_s}.updated_at DESC") }
 
     def log(message, status = EffectiveLogging.statuses.first, user = nil, options = {})
-      EffectiveLog.log(message, status, (options || {}).merge({:parent => self}))
+      EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
     end
 
   end
