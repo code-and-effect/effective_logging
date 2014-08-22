@@ -1,6 +1,6 @@
 %h2 Logs
 
-- unless @datatable.collection.length > 0
+- unless (@datatable.collection.length rescue 0) > 0
   %p
     There are no logs
 - else

@@ -1,7 +1,38 @@
 %h2 Log
 
-- unless @datatable.collection.length > 0
-  %p
-    There are no logs
-- else
-  = render_datatable @datatable
+.panel{:class => "panel-#{bootstrap_class_for_status(@log.status)}"}
+  .panel-heading
+    %strong= @log.message
+
+  .panel-body
+    .row
+      .col-lg-4
+        %span.label{:class => "label-#{bootstrap_class_for_status(@log.status)}"}= @log.status
+        &nbsp;
+        = @log.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        = '(' + time_ago_in_words(@log.created_at) + ' ago)'
+
+      .col-lg-4
+        - if @log.user.present?
+          %strong User:
+          &nbsp;
+          = @log.user
+          - links = [effective_logging_object_link_to(@log.user, :show), effective_logging_object_link_to(@log.user, :edit)].compact
+          - if links.present?
+            = "(#{links.join(' -')})".html_safe
+      .col-lg-4
+        - if @log.associated.present?
+          %strong Regarding:
+          &nbsp;
+          - if @log.associated.to_s.starts_with?('#<')
+            = "#{@log.associated.class.name} ##{@log.associated.to_param}"
+          - else
+            = @log.associated
+
+    - if @log.details
+      .row
+        .col-lg-12
+          %br
+          %p
+            %strong Details:
+          = simple_format(@log.details)
