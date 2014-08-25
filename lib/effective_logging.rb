@@ -11,6 +11,9 @@ module EffectiveLogging
   mattr_accessor :emails_enabled
   mattr_accessor :user_logins_enabled
 
+  mattr_accessor :page_views_enabled
+  mattr_accessor :page_views
+
   def self.setup
     yield self
   end

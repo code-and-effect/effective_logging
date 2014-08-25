@@ -18,7 +18,7 @@ class EffectiveLogger
       log.message = message
       log.status = status
 
-      log.user_id = options.delete(:user_id) if options[:user_id]
+      log.user_id = options.delete(:user_id).to_i if options[:user_id]
       log.user = options.delete(:user) if options[:user]
 
       log.parent = options.delete(:parent)
@@ -29,4 +29,5 @@ class EffectiveLogger
       log.save
     end
   end
+
 end

@@ -3,6 +3,7 @@ module EffectiveLogging
     engine_name 'effective_logging'
 
     config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
+    config.autoload_paths += Dir["#{config.root}/app/controllers/concerns"]
 
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
@@ -10,7 +11,8 @@ module EffectiveLogging
     end
 
     # Include Helper to base application
-    initializer 'effective_orders.action_controller' do |app|
+    # And extend LogPageViews concern
+    initializer 'effective_orders.action_controller_helper' do |app|
       ActiveSupport.on_load :action_controller do
         helper EffectiveLoggingHelper
       end
@@ -23,7 +25,7 @@ module EffectiveLogging
 
       EffectiveLogging.statuses.each do |status|
         EffectiveLogger.singleton_class.instance_eval do
-          send(:define_method, status) { |message, options={}| log(message, status, options) }
+          self.send(:define_method, status) { |message, options={}| log(message, status, options) }
         end
 
         Effective::Log.instance_eval do
@@ -32,12 +34,14 @@ module EffectiveLogging
       end
     end
 
+    # Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.emails_enabled == true
         ActionMailer::Base.register_interceptor(Effective::EmailLogger)
       end
     end
 
+    # Log User Logins
     initializer 'effective_logging.user_logins' do |app|
       if EffectiveLogging.user_logins_enabled == true
         if defined?(Devise) && (User.new().respond_to?(:after_database_authentication) rescue false)
@@ -51,11 +55,20 @@ module EffectiveLogging
       end
     end
 
-    # Include acts_as_addressable concern and allow any ActiveRecord object to call it
-    # initializer 'effective_logging.active_record' do |app|
-    #   ActiveSupport.on_load :active_record do
-    #     ActiveRecord::Base.extend(ActsAsObfuscated::ActiveRecord)
-    #   end
-    # end
+    # Log Page Views
+    initializer 'effective_logging.action_controller' do |app|
+      ActiveSupport.on_load :action_controller do
+        ActionController::Base.extend(LogPageViews::ActionController::ClassMethods)
+        ActionController::Base.include(LogPageViews::ActionController::InstanceMethods)
+
+        if EffectiveLogging.page_views_enabled
+          ApplicationController.instance_eval do
+            log_page_views EffectiveLogging.page_views
+          end
+        end
+        #ApplicationController.send(:log_page_views, EffectiveLogging.page_views) if EffectiveLogging.page_views_enabled
+      end
+    end
+
   end
 end

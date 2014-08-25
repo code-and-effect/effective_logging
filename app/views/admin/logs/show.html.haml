@@ -33,12 +33,20 @@
             = @log.associated
 
     - @log.details.each do |key, value|
+      - next unless value.present?
       .row
         .col-lg-12
           %br
           %p
-            %strong= "#{key.capitalize}:"
-          = simple_format(value.to_s)
+            %strong= "#{key.to_s.titleize}:"
+          - if value.kind_of?(Hash)
+            %table.table{:style => 'width: 50%'}
+              - value.each do |k, v|
+                %tr
+                  %th= k
+                  %td= v
+          - else
+            = simple_format(value.to_s)
 
     - if @log.logs.present?
       .row
