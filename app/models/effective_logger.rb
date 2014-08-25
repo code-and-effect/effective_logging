@@ -14,26 +14,19 @@ class EffectiveLogger
       raise ArgumentError.new("Log.log :associated => ... argument must be an ActiveRecord::Base object")
     end
 
-    @last = Effective::Log.new().tap do |log|
+    Effective::Log.new().tap do |log|
       log.message = message
       log.status = status
 
-      if options[:user].present?
-        log.user = options[:user]
-      elsif options[:user_id].present?
-        log.user_id = options[:user_id]
-      end
+      log.user_id = options.delete(:user_id) if options[:user_id]
+      log.user = options.delete(:user) if options[:user]
 
-      log.details = options[:details].try(:to_s)
-      log.associated = options[:associated]
-      log.parent = options[:parent]
+      log.parent = options.delete(:parent)
+      log.associated = options.delete(:associated)
 
-      log.save!
+      log.details = options if options.kind_of?(Hash)
+
+      log.save
     end
   end
-
-  def self.last
-    @last
-  end
-
 end

@@ -32,13 +32,13 @@
           - else
             = @log.associated
 
-    - if @log.details
+    - @log.details.each do |key, value|
       .row
         .col-lg-12
           %br
           %p
-            %strong Details:
-          = simple_format(@log.details)
+            %strong= "#{key.capitalize}:"
+          = simple_format(value.to_s)
 
     - if @log.logs.present?
       .row

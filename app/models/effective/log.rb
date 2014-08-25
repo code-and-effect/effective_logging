@@ -11,6 +11,8 @@ module Effective
     belongs_to :user
     belongs_to :associated, :polymorphic => true
 
+    serialize :details, Hash
+
     structure do
       logs_count          :integer  # Rails Counter Cache
 
@@ -26,6 +28,10 @@ module Effective
 
     def log(message, status = EffectiveLogging.statuses.first, user = nil, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
+    end
+
+    def details
+      self[:details] ||= {}
     end
 
   end
