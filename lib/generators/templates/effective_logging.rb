@@ -24,12 +24,9 @@ EffectiveLogging.setup do |config|
   # Log all successful user login attempts
   config.user_logins_enabled = true
 
-  # Log all page views
-  config.page_views_enabled = false
-  config.page_views = {
-    :details => true,    # When true, will also collect params, request.referrer, request.remote_ip, request.format, request.user_agent
-    :except => [:new, :create, :edit, :update, :destroy], # Only :index, :show and Non-RESTful actions will be logged
-    :skip_namespace => [Admin]  # If the controller is in these namespaces, skip the logging
-  }
+  ### You also have to manually add this to ApplicationController
+  # log_page_views :skip_namespace => [Admin], :details => true, :except => [:new, :create, :edit, :update, :destroy]
+  # and then you can use
+  # skip_log_page_views in additional controllers
 
 end

@@ -30,4 +30,10 @@ class EffectiveLogger
     end
   end
 
+  # Dynamically add logging methods based on the defined statuses
+  # EffectiveLogging.info 'my message'
+  (EffectiveLogging.statuses || []).each do |status|
+    self.singleton_class.send(:define_method, status) { |message, options={}| log(message, status, options) }
+  end
+
 end

@@ -34,6 +34,12 @@ module Effective
       self[:details] ||= {}
     end
 
+    # Dynamically add logging methods based on the defined statuses
+    # EffectiveLogging.info 'my message'
+    (EffectiveLogging.statuses || []).each do |status|
+      send(:define_method, status) { |message, options={}| log(message, status, options) }
+    end
+
   end
 end
 

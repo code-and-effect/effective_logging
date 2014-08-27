@@ -4,6 +4,9 @@ module Admin
 
     layout (EffectiveLogging.layout.kind_of?(Hash) ? EffectiveLogging.layout[:admin_logs] : EffectiveLogging.layout)
 
+    skip_log_page_views
+    helper EffectiveLoggingHelper
+
     def index
       @datatable = Effective::Datatables::Logs.new() if defined?(EffectiveDatatables)
       @page_title = 'Logs'

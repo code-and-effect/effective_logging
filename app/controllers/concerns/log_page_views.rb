@@ -2,63 +2,43 @@ module LogPageViews
   extend ActiveSupport::Concern
 
   module ActionController
-    module ClassMethods
-      def log_page_views(options = nil)
-        @log_page_view_options = options || {}
-        include ::LogPageViews
-      end
-
-      def skip_log_page_views(*args)
-        Rails.logger.info "CALLED ACTIONCONTROLLER SKIP PAGE VIEW"
-
-        self.instance_eval do
-          before_filter :skip_log_page_view, *args
-        end
-      end
-
+    def log_page_views(options = nil)
+      @log_page_view_options = options || {}
+      include ::LogPageViews
     end
 
-    module InstanceMethods
-      def skip_log_page_view
-        @_effective_logging_skip_log_page_view = true
-      end
+    def skip_log_page_views(options = {})
+      raise ArgumentException.new("EffectiveLogging error: skip_log_page_views called without first having called log_page_views. Please add 'log_page_views' to your ApplicationController or this controller before using skip_log_page_views")
     end
   end
 
   included do
     # Break up the options
-    logging_options = {}
-    filter_options = {}
-
+    logging_options = {} ; filter_options = {}
     @log_page_view_options.each do |k, v|
-      if [:except, :only, :if, :unless].include?(k)
-        filter_options[k] = v
-      else
-        logging_options[k] = v
-      end
+      [:details, :skip_namespace].include?(k) ? (logging_options[k] = v) : (filter_options[k] = v)
     end
 
-    # Store our Logging Options for later
-    self.send(:define_method, 'effective_logging_log_page_views_options') { logging_options }
+    cattr_accessor :log_page_views_opts
+    self.log_page_views_opts = logging_options
 
     # Set up the after_filter to do page logging
     after_filter :effective_logging_log_page_view, filter_options
   end
 
   module ClassMethods
-    def skip_log_page_views
-      Rails.logger.info "CALLED CLASS SKIP_LOG_PAGE_VIEWS"
-      Rails.logger.info self
+    def skip_log_page_views(options = {})
+      before_filter :skip_log_page_view, options
     end
   end
 
   def effective_logging_log_page_view
-    return if @_effective_logging_skip_log_page_view
-    return if (effective_logging_log_page_views_options[:skip_namespace] || []).include?(self.class.parent)
+    return if @_effective_logging_skip_log_page_view == true
+    return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.parent)
 
     user = (current_user rescue nil)
 
-    if effective_logging_log_page_views_options[:details] == true
+    if self.class.log_page_views_opts[:details] == true
       EffectiveLogger.info(
         "page view: #{request.request_method} #{request.path}",
         :user => user,
@@ -72,6 +52,9 @@ module LogPageViews
     end
   end
 
+  def skip_log_page_view
+    @_effective_logging_skip_log_page_view = true
+  end
 
 end
 

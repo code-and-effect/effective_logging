@@ -15,6 +15,10 @@ if defined?(EffectiveDatatables)
         table_column :status, :filter => {:type => :select, :values => EffectiveLogging.statuses }
         table_column :message, :width => '60%'
 
+        table_column :details, :visible => false do |log|
+          log.details.to_s
+        end
+
         table_column :actions, :sortable => false, :filter => false do |log|
           if log.logs_count.to_i > 0
             link_to "View&nbsp;(#{log.logs_count}&nbsp;more)".html_safe, effective_logging.admin_log_path(log)
