@@ -11,6 +11,6 @@ class @EffectiveLogger
 
     true
 
-  @success = (message, details...) -> @log(message, 'success', details)
-  @info = (message, details...) -> @log(message, 'info', details)
-  @error = (message, details...) -> @log(message, 'error', details)
+<% EffectiveLogging.statuses.each do |status| %>
+  <%= "@#{status} = (message, details...) -> @log(message, '#{status}', details)" %>
+<% end %>
