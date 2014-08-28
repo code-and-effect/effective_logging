@@ -27,7 +27,7 @@ module EffectiveLoggingHelper
               if v.kind_of?(Hash)
                 tableize_hash(v, options.merge({:th => (options.key?(:sub_th) ? options[:sub_th] : options[:th])}))
               elsif v.kind_of?(Array)
-                v.join(', ')
+                '[' + v.join(', ') + ']'
               else
                 v
               end

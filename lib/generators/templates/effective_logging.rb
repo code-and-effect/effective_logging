@@ -7,7 +7,7 @@ EffectiveLogging.setup do |config|
 
   # Admin Screen Layout Settings
   # Configure the Layout per controller, or all at once
-  config.layout = 'application'   # All EffectiveLogging controllers will use this layout
+  config.layout = 'admin'   # All EffectiveLogging controllers will use this layout
   #config.layout = { :admin_logs => 'application'}
 
   # All statuses defined here, as well as 'info', 'success', and 'error' (hardcoded) will be created as

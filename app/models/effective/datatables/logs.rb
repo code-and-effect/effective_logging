@@ -15,10 +15,10 @@ if defined?(EffectiveDatatables)
         end
 
         table_column :status, :filter => {:type => :select, :values => EffectiveLogging.statuses }
-        table_column :message, :width => '60%'
+        table_column :message, :width => '50%'
 
-        table_column :details, :visible => false do |log|
-          tableize_hash(log.details, :th => true, :sub_th => false)
+        table_column :details do |log|
+          tableize_hash(log.details, :th => true, :sub_th => false, :width => '100%')
         end
 
         table_column :actions, :sortable => false, :filter => false do |log|
