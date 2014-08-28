@@ -34,6 +34,14 @@ module Effective
       self[:details] ||= {}
     end
 
+    def next_log
+      @next_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id > ?', self.id).first
+    end
+
+    def prev_log
+      @prev_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id < ?', self.id).last
+    end
+
     # Dynamically add logging methods based on the defined statuses
     # EffectiveLogging.info 'my message'
     (EffectiveLogging.statuses || []).each do |status|

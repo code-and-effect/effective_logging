@@ -6,6 +6,10 @@
       = link_to(log.message, effective_logging.admin_log_path(log))
       = ' > '
     %strong= @log.message
+    .pull-right
+      = link_to_if(@log.prev_log.present?, '< Prev', effective_logging.admin_log_path(@log.prev_log || 0)) { 'Prev' }
+      = ' - '
+      = link_to_if(@log.next_log.present?, 'Next >', effective_logging.admin_log_path(@log.next_log || 0)) { 'Next' }
 
   .panel-body
     .row

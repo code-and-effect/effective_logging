@@ -30,7 +30,11 @@ if defined?(EffectiveDatatables)
         # A nil attributes[:log_id] means give me all the top level log entries
         # If we set a log_id then it's for sub logs
         def collection
-          Effective::Log.unscoped.where(:parent_id => attributes[:log_id]).includes(:user)
+          if attributes[:user_id].present?
+            Effective::Log.unscoped.where(:parent_id => attributes[:log_id]).where(:user_id => attributes[:user_id]).includes(:user)
+          else
+            Effective::Log.unscoped.where(:parent_id => attributes[:log_id]).includes(:user)
+          end
         end
 
       end
