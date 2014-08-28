@@ -8,7 +8,7 @@ module LogPageViews
     end
 
     def skip_log_page_views(options = {})
-      raise ArgumentException.new("EffectiveLogging error: skip_log_page_views called without first having called log_page_views. Please add 'log_page_views' to your ApplicationController or this controller before using skip_log_page_views")
+      Rails.logger.info("WARNING EffectiveLogging: skip_log_page_views called without first having called log_page_views. Please add 'log_page_views' to your ApplicationController or this controller before using skip_log_page_views")
     end
   end
 
