@@ -23,7 +23,7 @@ class EffectiveLogger
       log.parent = options.delete(:parent)
       log.associated = options.delete(:associated)
 
-      log.details = options if options.kind_of?(Hash)
+      log.details = options.delete_if { |k, v| v.present? } if options.kind_of?(Hash)
 
       log.save
     end

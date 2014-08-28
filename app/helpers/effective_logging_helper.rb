@@ -15,6 +15,29 @@ module EffectiveLoggingHelper
     parents.compact.reverse
   end
 
+  # Call me with :th => true, :sub_th => false
+  # Any other options are sent to the table tag
+  def tableize_hash(hash, options = {})
+    if hash.present?
+      content_tag(:table, options) do
+        hash.map do |k, v|
+          content_tag(:tr) do
+            content_tag((options[:th] ? :th : :td), k) +
+            content_tag(:td) do
+              if v.kind_of?(Hash)
+                tableize_hash(v, options.merge({:th => (options.key?(:sub_th) ? options[:sub_th] : options[:th])}))
+              elsif v.kind_of?(Array)
+                v.join(', ')
+              else
+                v
+              end
+            end
+          end
+        end.join('').html_safe
+      end.html_safe
+    end
+  end
+
   # This is called on the Logs#show Admin page, and is intended for override by the application
   def effective_logging_object_link_to(obj, action = :show)
     if obj.kind_of?(User)

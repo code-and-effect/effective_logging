@@ -2,6 +2,8 @@ if defined?(EffectiveDatatables)
   module Effective
     module Datatables
       class Logs < Effective::Datatable
+        include EffectiveLoggingHelper
+
         default_order :created_at, :desc
 
         table_column :created_at do |log|
@@ -16,7 +18,7 @@ if defined?(EffectiveDatatables)
         table_column :message, :width => '60%'
 
         table_column :details, :visible => false do |log|
-          log.details.to_s
+          tableize_hash(log.details, :th => true, :sub_th => false)
         end
 
         table_column :actions, :sortable => false, :filter => false do |log|
