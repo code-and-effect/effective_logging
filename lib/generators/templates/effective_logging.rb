@@ -5,13 +5,11 @@ EffectiveLogging.setup do |config|
   # Authorization Method - Can this user view the Admin screen?
   config.authorization_method = Proc.new { |controller, action, resource| can?(action, resource) } # CanCan gem
 
-  # Admin Screen Layout Settings
-  # Configure the Layout per controller, or all at once
-  config.layout = 'admin'   # All EffectiveLogging controllers will use this layout
-  #config.layout = { :admin_logs => 'application'}
+  # Admin Screens Layout Settings
+  config.layout = 'application'   # All EffectiveLogging controllers will use this layout
 
   # All statuses defined here, as well as 'info', 'success', and 'error' (hardcoded) will be created as
-  # EffectiveLogger.info 'my message' macros
+  # EffectiveLogger.info('my message') macros
   config.additional_statuses = []
 
   #########################################
@@ -23,10 +21,5 @@ EffectiveLogging.setup do |config|
 
   # Log all successful user login attempts
   config.user_logins_enabled = true
-
-  ### You also have to manually add this to ApplicationController
-  # log_page_views :skip_namespace => [Admin], :details => true, :except => [:new, :create, :edit, :update, :destroy]
-  # and then you can use
-  # skip_log_page_views in additional controllers
 
 end

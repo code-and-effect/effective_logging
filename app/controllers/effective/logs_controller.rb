@@ -26,7 +26,7 @@ module Effective
         log.save
       end
 
-      head :ok
+      render :text => "ok", :status => :ok
     end
 
     private
