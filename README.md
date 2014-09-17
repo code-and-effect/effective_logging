@@ -83,7 +83,7 @@ Any log can have children logs.  This is perfect for long-running tasks where th
 log = EffectiveLogger.info('importing important records')
 
 log.success('record 1 imported', :associated => @record1)
-log.error('recort 2 failed to import', :associated => @record2)
+log.error('record 2 failed to import', :associated => @record2)
 log.success('record 3 imported', :associated => @record3)
 ```
 
@@ -130,7 +130,7 @@ The above command will log all requests to index, show and non-RESTful controlle
 
 Page views always log the current_user when present.
 
-By default, the request.params, request.format, request.referrer and request.user_agent information is also logged, unless log_page_views :details => false is used.
+By default, the request.params, request.format, request.referrer and request.user_agent information is also logged, unless :details => false is set.
 
 
 Instead of logging all requests as per the ApplicationController, it may be easier to selectively log page views on just one or more controllers:
@@ -159,7 +159,7 @@ class ProductsController < ApplicationController
 end
 ```
 
-The above command will skip logging of the :show action and will skip logging of the index action if the current_user is an admin.
+The above command will skip logging of the :show action and will skip logging of the :index action if the current_user is an admin.
 
 log_page_views accepts any options that an after_filter would accept.
 
@@ -182,11 +182,13 @@ EffectiveLogger.success('clicked start on a video');
 
 the above command sends an AJAX request that creates the Log.  If the current_user is present :user will be automatically set.
 
-To attach additional information:
+The syntax to attach (any number of) additional information fields is very forgiving:
 
 ```javascript
 EffectiveLogger.info('clicked start on a video', {video_title: 'cool video', video_time: '5:00'});
 ```
+
+and
 
 ```javascript
 EffectiveLogger.success('some other event', 'additional', 'information', {subject: 'my subject', from: 'someone'}, 'and more');

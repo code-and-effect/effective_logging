@@ -4,6 +4,8 @@ module Effective
 
     # This is a post from our Javascript
     def create
+      EffectiveLogging.authorized?(self, :create, Effective::Log.new())
+
       @log = Effective::Log.new().tap do |log|
         log.message = log_params[:message]
         log.status = (EffectiveLogging.statuses.include?(log_params[:status]) ? log_params[:status] : 'info')
