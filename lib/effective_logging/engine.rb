@@ -20,13 +20,15 @@ module EffectiveLogging
     # Automatically Log User Logins
     initializer 'effective_logging.user_logins' do |app|
       if EffectiveLogging.user_logins_enabled == true
-        if defined?(Devise) && (User.new().respond_to?(:after_database_authentication) rescue false)
-          User.instance_eval do
-            alias_method :original_after_database_authentication, :after_database_authentication
-            send(:define_method, :after_database_authentication) { Effective::UserLogger.successful_login(self) ; original_after_database_authentication() }
+        ActiveSupport.on_load :active_record do
+          if defined?(Devise)
+            User.instance_eval do
+              alias_method :original_after_database_authentication, :after_database_authentication
+              send(:define_method, :after_database_authentication) { Effective::UserLogger.successful_login(self) ; original_after_database_authentication() }
+            end
+          else
+            raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise and a user class defined as User")
           end
-        else
-          raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise and a user class defined as User")
         end
       end
     end
