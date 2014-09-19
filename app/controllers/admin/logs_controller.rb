@@ -4,7 +4,7 @@ module Admin
 
     layout (EffectiveLogging.layout.kind_of?(Hash) ? EffectiveLogging.layout[:admin_logs] : EffectiveLogging.layout)
 
-    skip_log_page_views
+    skip_log_page_views :quiet => true
     helper EffectiveLoggingHelper
 
     def index
