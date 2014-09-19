@@ -213,6 +213,35 @@ Then you should be able to visit:
 link_to 'Logs', effective_logging.admin_logs_path   # /admin/logs
 ```
 
+### Build an All Logs Screen
+
+If you don't want to use the builtin Admin screen, and would rather render the effective_datatable of logs elsewhere
+
+In your controller:
+
+```ruby
+@datatable = Effective::Datatables::Logs.new()
+```
+
+And then in your view:
+
+```ruby
+render_datatable(@datatable)
+```
+
+### Build a User Specific Logs Screen
+
+We can also use a similar method to create a datatable of logs for just one user.
+
+When initialized with :user_id, the 'User' column is hidden and the Logs are scoped to the User.
+
+In your controller:
+
+```ruby
+@user = User.find(params[:id])
+@datatable = Effective::Datatables::Logs.new(:user_id => @user.id)
+```
+
 
 ## License
 
