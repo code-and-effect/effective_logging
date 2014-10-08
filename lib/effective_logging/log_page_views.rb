@@ -56,6 +56,11 @@ module EffectiveLogging
       def skip_log_page_view
         @_effective_logging_skip_log_page_view = true
       end
+
+      def skip_log_page_views
+        @_effective_logging_skip_log_page_view = true
+      end
+
     end
 
   end

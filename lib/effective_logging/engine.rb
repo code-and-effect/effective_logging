@@ -35,15 +35,7 @@ module EffectiveLogging
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.action_controller' do |app|
       ActiveSupport.on_load :action_controller do
-        #ActionController.instance_eval do
-        #   include LogPageViews::InstanceMethods
-
-        #end
-
-        ActionController::Base.class_eval do
-          extend EffectiveLogging::LogPageViews::ActionController
-        end
-
+        ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
       end
     end
 
