@@ -3,7 +3,6 @@ module EffectiveLogging
     engine_name 'effective_logging'
 
     config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
-    config.autoload_paths += Dir["#{config.root}/app/controllers/concerns"]
 
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
@@ -36,7 +35,15 @@ module EffectiveLogging
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.action_controller' do |app|
       ActiveSupport.on_load :action_controller do
-        ActionController::Base.extend(LogPageViews::ActionController)
+        #ActionController.instance_eval do
+        #   include LogPageViews::InstanceMethods
+
+        #end
+
+        ActionController::Base.class_eval do
+          extend EffectiveLogging::LogPageViews::ActionController
+        end
+
       end
     end
 
