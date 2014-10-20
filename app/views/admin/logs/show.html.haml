@@ -46,7 +46,8 @@
           - if value.kind_of?(Hash)
             = tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
           - else
-            = simple_format(value.to_s)
+            - allowed_tags = ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tr', 'td', 'th']
+            = simple_format(sanitize(value.to_s, :tags => allowed_tags), {}, :sanitize => false)
 
     - if @log.logs.present?
       .row
