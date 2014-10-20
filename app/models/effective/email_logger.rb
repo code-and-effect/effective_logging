@@ -17,9 +17,9 @@ module Effective
         user = User.where(:email => email).first
 
         if user.present?
-          EffectiveLogger.success("email sent: #{message.subject}", :user => user, :email => message_header + '<hr>' + message_body)
+          EffectiveLogger.success("email sent: #{message.subject}", :user => user, :recipient => email, :subject => message.subject, :email => message_header + '<hr>' + message_body)
         else
-          EffectiveLogger.success("email sent to #{email}: #{message.subject}", :email => message_header + '<hr>' + message_body)
+          EffectiveLogger.success("email sent to #{email}: #{message.subject}", :recipient => email, :subject => message.subject, :email => message_header + '<hr>' + message_body)
         end
       end
     end
