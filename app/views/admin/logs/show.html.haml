@@ -3,13 +3,13 @@
 .panel{:class => "panel-#{bootstrap_class_for_status(@log.status)}"}
   .panel-heading
     - parents_of_log(@log).each do |log|
-      = link_to(log.message, effective_logging.admin_log_path(log))
+      = link_to(log.message, (@_effective_logging_active_admin ? admin_effective_log_path(log) : effective_logging.admin_log_path(log)))
       = ' > '
     %strong= @log.message
     .pull-right
-      = link_to_if(@log.prev_log.present?, '< Prev', effective_logging.admin_log_path(@log.prev_log || 0)) { 'Prev' }
+      = link_to_if(@log.prev_log.present?, '< Prev', (@_effective_logging_active_admin ? admin_effective_log_path(@log.prev_log || 0) : effective_logging.admin_log_path(@log.prev_log || 0))) { 'Prev' }
       = ' - '
-      = link_to_if(@log.next_log.present?, 'Next >', effective_logging.admin_log_path(@log.next_log || 0)) { 'Next' }
+      = link_to_if(@log.next_log.present?, 'Next >', (@_effective_logging_active_admin ? admin_effective_log_path(@log.next_log || 0) : effective_logging.admin_log_path(@log.next_log || 0))) { 'Next' }
 
   .panel-body
     .row
@@ -23,7 +23,7 @@
         - if @log.user.present?
           %strong User:
           &nbsp;
-          = @log.user
+          = (@log.user.to_s.starts_with?('#<User:0x') ? (@log.user.email rescue @log.user) : @log.user)
           - links = [effective_logging_object_link_to(@log.user, :show), effective_logging_object_link_to(@log.user, :edit)].compact
           - if links.present?
             = "(#{links.join(' - ')})".html_safe

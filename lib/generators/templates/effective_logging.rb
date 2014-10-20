@@ -23,6 +23,9 @@ EffectiveLogging.setup do |config|
   # config.authorization_method = false
   config.authorization_method = Proc.new { |controller, action, resource| true }  # All users can see every screen
 
+  # Register Effective::Logs with ActiveAdmin if ActiveAdmin is present
+  config.use_active_admin = true
+
   # Admin Screens Layout Settings
   config.layout = 'application'   # All EffectiveLogging controllers will use this layout
 

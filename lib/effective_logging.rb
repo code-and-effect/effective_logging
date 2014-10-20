@@ -5,6 +5,8 @@ require "effective_logging/log_page_views"
 module EffectiveLogging
   # The following are all valid config keys
   mattr_accessor :logs_table_name
+  mattr_accessor :use_active_admin
+
   mattr_accessor :authorization_method
   mattr_accessor :layout
   mattr_accessor :additional_statuses
