@@ -6,9 +6,7 @@ if defined?(EffectiveDatatables)
 
         default_order :created_at, :desc
 
-        table_column :created_at do |log|
-          log.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        end
+        table_column :created_at
 
         table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter => {:type => :select, :values => Proc.new { User.all.order(:email).map { |obj| [obj.id, obj.email] } }} do |log|
           log.user.try(:email)
