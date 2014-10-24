@@ -24,26 +24,26 @@ module EffectiveLogging
       end
     end
 
-    # Automatically Log User Logins
-    initializer 'effective_logging.user_logins' do |app|
+    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    initializer 'effective_logging.action_controller' do |app|
+      ActiveSupport.on_load :action_controller do
+        ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
+      end
+    end
+
+    # This has to be run after initialization or User hasn't been loaded yet
+    config.after_initialize do
       if EffectiveLogging.user_logins_enabled == true
         ActiveSupport.on_load :active_record do
           if defined?(Devise)
             User.instance_eval do
               alias_method :original_after_database_authentication, :after_database_authentication
-              send(:define_method, :after_database_authentication) { Effective::UserLogger.successful_login(self) ; original_after_database_authentication() }
+              define_method(:after_database_authentication) { Effective::UserLogger.successful_login(self) ; original_after_database_authentication() }
             end
           else
             raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise and a user class defined as User")
           end
         end
-      end
-    end
-
-    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
-    initializer 'effective_logging.action_controller' do |app|
-      ActiveSupport.on_load :action_controller do
-        ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
       end
     end
 
