@@ -1,6 +1,6 @@
-module Effective
+module EffectiveLogging
   class EmailLogger
-    def self.delivering_email(message)
+    def self.delivered_email(message)
       return unless message.present?
 
       # Cleanup the Header

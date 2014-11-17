@@ -2,8 +2,6 @@ module EffectiveLogging
   class Engine < ::Rails::Engine
     engine_name 'effective_logging'
 
-    config.autoload_paths += Dir["#{config.root}/app/models/**/"]
-
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
       eval File.read("#{config.root}/lib/generators/templates/effective_logging.rb")
@@ -20,7 +18,8 @@ module EffectiveLogging
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.emails_enabled == true
-        ActionMailer::Base.register_interceptor(Effective::EmailLogger)
+        require 'effective_logging/email_logger'
+        ActionMailer::Base.register_observer(EffectiveLogging::EmailLogger)
       end
     end
 
