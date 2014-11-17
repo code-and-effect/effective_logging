@@ -161,9 +161,14 @@ end
 
 The above command will skip logging of the :show action and will skip logging of the :index action if the current_user is an admin.
 
-log_page_views accepts any options that an after_filter would accept.
+log_page_views accepts any options that an after_filter would accept and has access to the request object
 
-skip_log_page_views accepts any options that a before_filter would accept.
+```ruby
+class ProductsController < ApplicationController
+  log_page_views :if => Proc.new { request.get? }  # Only log GET requests
+end
+
+Similarly, skip_log_page_views also accepts any options that a before_filter would accept.
 
 
 ### Logging From JavaScript

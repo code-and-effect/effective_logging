@@ -2,7 +2,7 @@ module EffectiveLogging
   class Engine < ::Rails::Engine
     engine_name 'effective_logging'
 
-    config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
+    config.autoload_paths += Dir["#{config.root}/app/models/**/"]
 
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
