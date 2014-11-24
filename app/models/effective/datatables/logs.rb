@@ -15,7 +15,7 @@ if defined?(EffectiveDatatables)
         table_column :status, :filter => {:type => :select, :values => EffectiveLogging.statuses }
         table_column :message, :width => '50%'
 
-        table_column :details do |log|
+        table_column :details, :visible => false do |log|
           log.details.delete(:email)
           tableize_hash(log.details, :th => true, :sub_th => false, :width => '100%')
         end
