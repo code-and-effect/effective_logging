@@ -2,6 +2,11 @@ module Effective
   class Log < ActiveRecord::Base
     self.table_name = EffectiveLogging.logs_table_name.to_s
 
+    # These 3 attr_accessors are set on the controller #show actions
+    attr_accessor :datatable
+    attr_accessor :next_log
+    attr_accessor :prev_log
+
     # Self-Referencing relationship
     belongs_to :parent, :class_name => 'Effective::Log', :counter_cache => true
     has_many :logs, :dependent => :destroy, :class_name => 'Effective::Log', :foreign_key => :parent_id
@@ -34,13 +39,13 @@ module Effective
       self[:details] ||= {}
     end
 
-    def next_log
-      @next_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id > ?', self.id).first
-    end
+    # def next_log
+    #   @next_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id > ?', self.id).first
+    # end
 
-    def prev_log
-      @prev_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id < ?', self.id).last
-    end
+    # def prev_log
+    #   @prev_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id < ?', self.id).last
+    # end
 
     # Dynamically add logging methods based on the defined statuses
     # EffectiveLogging.info 'my message'
