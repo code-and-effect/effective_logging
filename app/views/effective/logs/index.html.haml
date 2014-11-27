@@ -1,0 +1,7 @@
+%h2= @page_title
+
+- unless (@datatable.collection.length rescue 0) > 0
+  %p
+    You have no previous recorded activity
+- else
+  = render_datatable @datatable

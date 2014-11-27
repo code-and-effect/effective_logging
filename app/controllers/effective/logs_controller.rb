@@ -1,6 +1,7 @@
 module Effective
   class LogsController < ApplicationController
     skip_log_page_views
+    before_filter :authenticate_user!, :only => [:index, :show] # Devise ensure logged in
 
     # This is a post from our Javascript
     def create
@@ -30,6 +31,30 @@ module Effective
 
       render :text => "ok", :status => :ok
     end
+
+    # This is the User index event
+    def index
+      @datatable = Effective::Datatables::Logs.new(:user_id => current_user.id) if defined?(EffectiveDatatables)
+      @page_title = 'My Activity'
+
+      EffectiveLogging.authorized?(self, :index, Effective::Log.new(:user_id => current_user.id))
+    end
+
+    # This is the User show event
+    def show
+      @log = Effective::Log.where(:user_id => current_user.id).includes(:logs).find(params[:id])
+      @log.next_log = Effective::Log.unscoped.where(:user_id => current_user.id).order(:id).where(:parent_id => @log.parent_id).where('id > ?', @log.id).first
+      @log.prev_log = Effective::Log.unscoped.where(:user_id => current_user.id).order(:id).where(:parent_id => @log.parent_id).where('id < ?', @log.id).last
+
+      @page_title = "Log ##{@log.to_param}"
+
+      if @log.logs.present?
+        @log.datatable = Effective::Datatables::Logs.new(:user_id => current_user.id, :log_id => @log.id) if defined?(EffectiveDatatables)
+      end
+
+      EffectiveLogging.authorized?(self, :show, @log)
+    end
+
 
     private
 
