@@ -7,10 +7,7 @@ if defined?(EffectiveDatatables)
         default_order :created_at, :desc
 
         table_column :created_at
-
-        table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter => {:type => :select, :values => Proc.new { User.all.order(:email).map { |obj| [obj.id, obj.email] } }} do |log|
-          log.user.try(:email)
-        end
+        table_column :user
 
         table_column :status, :filter => {:type => :select, :values => EffectiveLogging.statuses }
         table_column :message, :width => '50%'
@@ -21,7 +18,14 @@ if defined?(EffectiveDatatables)
         end
 
         table_column :actions, :sortable => false, :filter => false do |log|
-          show_path = (attributes[:active_admin] ? admin_effective_log_path(log) : effective_logging.admin_log_path(log))
+          show_path =
+            if datatables_active_admin_path?
+              admin_effective_log_path(log)
+            elsif datatables_admin_path?
+              effective_logging.admin_log_path(log)
+            else
+              effective_logging.log_path(log)
+            end
 
           if log.logs_count.to_i > 0
             link_to "View&nbsp;(#{log.logs_count}&nbsp;more)".html_safe, show_path
@@ -39,7 +43,6 @@ if defined?(EffectiveDatatables)
             Effective::Log.unscoped.where(:parent_id => attributes[:log_id]).includes(:user)
           end
         end
-
       end
     end
   end
