@@ -1,0 +1,59 @@
+.panel{:class => "panel-#{bootstrap_class_for_status(log.status)}"}
+  .panel-heading
+    - parents_of_log(log).each do |parent|
+      = link_to(log.message, (request.fullpath.gsub(log.to_param, parent.to_param) rescue '#'))
+      = ' > '
+    %strong= log.message
+    .pull-right
+      = link_to_if(log.prev_log.present?, '< Prev', (request.fullpath.gsub(log.to_param, log.prev_log.try(:to_param).to_s))) { 'Prev' }
+      = ' - '
+      = link_to_if(log.next_log.present?, 'Next >', (request.fullpath.gsub(log.to_param, log.next_log.try(:to_param).to_s))) { 'Next' }
+
+  .panel-body
+    .row
+      .col-lg-6
+        %span.label{:class => "label-#{bootstrap_class_for_status(log.status)}"}= log.status
+        &nbsp;
+        = log.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        = '(' + time_ago_in_words(log.created_at) + ' ago)'
+
+      .col-lg-6
+        - if log.user.present?
+          %strong User:
+          &nbsp;
+          = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
+        - if log.associated.present?
+          %br
+          %strong Regarding:
+          &nbsp;
+          - if log.associated.to_s.starts_with?('#<')
+            = "#{log.associated.class.name} ##{log.associated.to_param}"
+          - else
+            = log.associated
+
+    - log.details.each do |key, value|
+      - next unless value.present?
+      .row
+        .col-lg-12
+          %br
+          %p
+            %strong= "#{key.to_s.titleize}:"
+          - if value.kind_of?(Hash)
+            = tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
+          - else
+            - allowed_tags = ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']
+            - allowed_attributes = ActionView::Base.sanitized_allowed_attributes.to_a + ['colspan', 'rowspan']
+            = simple_format(sanitize(value.to_s, :tags => allowed_tags, :attributes => allowed_attributes), {}, :sanitize => false)
+
+    - if log.logs.present?
+      .row
+        .col-lg-12
+          %br
+          %p
+            %strong Additional Entries:
+            = "this log contains #{log.logs_count} additional sub entries"
+      - if log.datatable.present?
+        %hr
+        .row
+          .col-lg-12= render_datatable log.datatable
+

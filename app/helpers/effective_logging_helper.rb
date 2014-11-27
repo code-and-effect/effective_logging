@@ -9,6 +9,10 @@ module EffectiveLoggingHelper
     end
   end
 
+  def render_log(log)
+    render(:partial => 'effective/logs/log', :locals => {:log => log})
+  end
+
   def parents_of_log(log)
     parents = [log.parent]
     parents << parents.last.parent while(parents.last.try(:parent_id).present?)

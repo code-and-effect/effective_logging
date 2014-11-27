@@ -1,4 +1,8 @@
 .fluid-container
   .row
     .col-sm-12
-      = render :file => 'admin/logs/index'
+      - unless (@datatable.collection.length rescue 0) > 0
+        %p
+          There are no logs
+      - else
+        = render_datatable @datatable
