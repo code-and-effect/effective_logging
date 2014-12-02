@@ -167,6 +167,7 @@ log_page_views accepts any options that an after_filter would accept and has acc
 class ProductsController < ApplicationController
   log_page_views :if => Proc.new { request.get? }  # Only log GET requests
 end
+```
 
 Similarly, skip_log_page_views also accepts any options that a before_filter would accept.
 
@@ -206,7 +207,7 @@ Creating child logs via JavaScript is not yet supported.
 
 ## Admin Screen
 
-To use the Admin screen, please also install the effective_datatables gem:
+To use the Admin screen, please also install the [effective_datatables](https://github.com/code-and-effect/effective_datatables/) gem:
 
 ```ruby
 gem 'effective_datatables', :git => 'https://github.com/code-and-effect/effective_datatables.git'
@@ -255,7 +256,7 @@ MIT License.  Copyright Code and Effect Inc. http://www.codeandeffect.com
 You are not granted rights or licenses to the trademarks of Code and Effect
 
 
-### Testing
+## Testing
 
 The test suite for this gem is unfortunately not yet complete.
 
@@ -264,3 +265,14 @@ Run tests by:
 ```ruby
 rake spec
 ```
+
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Bonus points for test coverage
+6. Create new Pull Request
+
