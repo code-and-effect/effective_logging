@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.email       = ["info@codeandeffect.com"]
   s.authors     = ["Code and Effect"]
   s.homepage    = "https://github.com/code-and-effect/effective_logging"
-  s.summary     = "TODO"
-  s.description = "TODO"
+  s.summary     = "Automatically log all sent emails, user logins, and page views. This also will log custom events from Ruby and JavaScript."
+  s.description = "Automatically log all sent emails, user logins, and page views. This also will log custom events from Ruby and JavaScript."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["spec/**/*"]

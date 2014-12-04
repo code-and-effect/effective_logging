@@ -1,5 +1,7 @@
 # Effective Logging
 
+Automatically log all sent emails, user logins, and page views. This also will log custom events from Ruby and JavaScript.
+
 A Rails3 / Rails4 engine to completely handle logging of events.
 
 Logs are stored in a single database table. A Log (one logged event) can have many children Logs, nested to any depth.
@@ -20,7 +22,7 @@ Has an effective_datatables driven admin interface to display and search/sort/fi
 Add to your Gemfile:
 
 ```ruby
-gem 'effective_logging', :git => 'https://github.com/code-and-effect/effective_logging.git'
+gem 'effective_logging'
 ```
 
 Run the bundle command to install it:
@@ -210,7 +212,7 @@ Creating child logs via JavaScript is not yet supported.
 To use the Admin screen, please also install the [effective_datatables](https://github.com/code-and-effect/effective_datatables/) gem:
 
 ```ruby
-gem 'effective_datatables', :git => 'https://github.com/code-and-effect/effective_datatables.git'
+gem 'effective_datatables'
 ```
 
 Then you should be able to visit:
