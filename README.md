@@ -99,9 +99,9 @@ This behaviour can be disabled in the config/initializers/effective_logging.rb i
 If the TO email address match a User, the :user will be set appropriately.
 
 
-### Automatic Logging of User Logins
+### Automatic Logging of User Login and Logout
 
-Any successful User logins via Devise will be automatically logged.
+Any successful User logins and logouts via Devise will be automatically logged.
 
 This behaviour can be disabled in the config/initializers/effective_logging.rb initializer.
 
