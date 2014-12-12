@@ -35,12 +35,9 @@ module EffectiveLogging
       if EffectiveLogging.user_logins_enabled == true
         ActiveSupport.on_load :active_record do
           if defined?(Devise)
-            User.instance_eval do
-              alias_method :original_after_database_authentication, :after_database_authentication
-              define_method(:after_database_authentication) { Effective::UserLogger.successful_login(self) ; original_after_database_authentication() }
-            end
+            EffectiveLogging::UserLogger.create_warden_hooks()
           else
-            raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise and a user class defined as User")
+            raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise")
           end
         end
       end

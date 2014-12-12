@@ -1,6 +1,7 @@
 require "effective_logging/engine"
 require "effective_logging/version"
 require "effective_logging/log_page_views"
+require "effective_logging/user_logger"
 
 module EffectiveLogging
   # The following are all valid config keys
