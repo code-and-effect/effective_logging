@@ -16,7 +16,8 @@ if defined?(EffectiveDatatables)
 
         table_column :parent_id, visible: false
         table_column(:user, type: :string, column: USER_COLUMN_SQL) do |log|
-          link_to(log.user_name, edit_admin_user_path(log.user_id)) rescue log.user_name
+          link_path = (edit_admin_user_path(log.user_id) rescue admin_user_path(log.user_id)) rescue ''
+          link_path.blank? ? log.user_name : link_to(log.user_name, link_path)
         end
 
         table_column :associated_id, visible: false
