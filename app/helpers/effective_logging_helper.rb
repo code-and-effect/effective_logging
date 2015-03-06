@@ -1,4 +1,7 @@
 module EffectiveLoggingHelper
+  ALLOWED_TAGS = ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']
+  ALLOWED_ATTRIBUTES = ActionView::Base.sanitized_allowed_attributes.to_a + ['colspan', 'rowspan']
+
   def bootstrap_class_for_status(status)
     case status
       when 'success'  ; 'success'
@@ -52,6 +55,16 @@ module EffectiveLoggingHelper
           link_to('Edit', edit_admin_user_path(obj))
         end
       )
+    end
+  end
+
+  def format_log_details_value(value)
+    if value.kind_of?(Hash)
+      tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
+    elsif value.kind_of?(Array)
+      value.map { |value| simple_format(sanitize(value.to_s, :tags => ALLOWED_TAGS, :attributes => ALLOWED_ATTRIBUTES), {}, :sanitize => false) }.join('').html_safe
+    else
+      simple_format(sanitize(value.to_s, :tags => ALLOWED_TAGS, :attributes => ALLOWED_ATTRIBUTES), {}, :sanitize => false)
     end
   end
 

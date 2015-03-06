@@ -38,12 +38,7 @@
           %br
           %p
             %strong= "#{key.to_s.titleize}:"
-          - if value.kind_of?(Hash)
-            = tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
-          - else
-            - allowed_tags = ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']
-            - allowed_attributes = ActionView::Base.sanitized_allowed_attributes.to_a + ['colspan', 'rowspan']
-            = simple_format(sanitize(value.to_s, :tags => allowed_tags, :attributes => allowed_attributes), {}, :sanitize => false)
+          = format_log_details_value(value)
 
     - if log.logs.present?
       .row
