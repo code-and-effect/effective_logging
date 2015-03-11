@@ -1,8 +1,5 @@
 .fluid-container
   .row
     .col-sm-12
-      - unless (@datatable.collection.length rescue 0) > 0
-        %p
-          There are no logs
-      - else
-        = render_datatable @datatable
+      = render_datatable @datatable do
+        %p There are no logs

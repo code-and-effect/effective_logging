@@ -47,8 +47,8 @@
           %p
             %strong Additional Entries:
             = "this log contains #{log.logs_count} additional sub entries"
-      - if log.datatable.present?
+      - if log.datatable.nil? == false
         %hr
         .row
-          .col-lg-12= render_datatable log.datatable
+          .col-lg-12= render_datatable(log.datatable)
 
