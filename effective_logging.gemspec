@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", [">= 3.2.0"]
+  s.add_dependency "effective_datatables", [">= 1.3.0"]
   s.add_dependency "coffee-rails"
   s.add_dependency "devise"
   s.add_dependency "haml"
