@@ -36,7 +36,7 @@ module Effective
     end
 
     def details
-      self[:details] ||= {}
+      ((self[:details] ||= {}) rescue {})
     end
 
     # def next_log

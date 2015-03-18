@@ -25,7 +25,7 @@ module EffectiveLoggingHelper
   # Call me with :th => true, :sub_th => false
   # Any other options are sent to the table tag
   def tableize_hash(hash, options = {})
-    if hash.present?
+    if hash.present? && hash.kind_of?(Hash)
       content_tag(:table, options) do
         hash.map do |k, v|
           content_tag(:tr) do
@@ -42,6 +42,8 @@ module EffectiveLoggingHelper
           end
         end.join('').html_safe
       end.html_safe
+    else
+      hash.to_s.html_safe
     end
   end
 
