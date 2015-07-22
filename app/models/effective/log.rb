@@ -26,10 +26,14 @@ module Effective
 
       status              :string, :validates => [:presence, :inclusion => {:in => EffectiveLogging.statuses }]
 
+      read_at             :datetime
       timestamps
     end
 
     default_scope -> { order("#{EffectiveLogging.logs_table_name.to_s}.updated_at DESC") }
+
+    scope :read,   -> { where('read_at IS NOT NULL') }
+    scope :unread, -> { where(read_at: nil) }
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
@@ -37,6 +41,10 @@ module Effective
 
     def details
       ((self[:details] ||= {}) rescue {})
+    end
+
+    def read
+      touch(:read_at)
     end
 
     # def next_log
