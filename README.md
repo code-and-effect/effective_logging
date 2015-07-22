@@ -250,6 +250,14 @@ In your controller:
 @datatable = Effective::Datatables::Logs.new(:user_id => @user.id)
 ```
 
+### Marking logs as read
+
+If you want to keep track of logs that have been read or not, you can do that
+with a timestamp `read_at` on each log object. Here are some relevant methods:
+
+- `Effective::Log#read` - updates the `read_at` field with the current time
+- `Effective::Log::read` and `Effective::Log::unread` - scopes to find all read and unread logs
+
 
 ## License
 

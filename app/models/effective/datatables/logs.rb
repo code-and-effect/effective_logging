@@ -23,6 +23,7 @@ if defined?(EffectiveDatatables)
           tableize_hash(log.details, th: true, sub_th: false, width: '100%')
         end
 
+        table_column :read_at, visible: false
         table_column :updated_at, visible: false
 
         table_column :actions, sortable: false, filter: false do |log|
