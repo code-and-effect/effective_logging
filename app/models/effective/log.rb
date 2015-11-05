@@ -18,16 +18,16 @@ module Effective
 
     serialize :details, Hash
 
-    structure do
-      logs_count          :integer  # Rails Counter Cache
+    # structure do
+    #   logs_count          :integer  # Rails Counter Cache
+    #   message             :string, :validates => [:presence]
+    #   details             :text
+    #   status              :string, :validates => [:presence, :inclusion => {:in => EffectiveLogging.statuses }]
+    #   timestamps
+    # end
 
-      message             :string, :validates => [:presence]
-      details             :text
-
-      status              :string, :validates => [:presence, :inclusion => {:in => EffectiveLogging.statuses }]
-
-      timestamps
-    end
+    validates_presence_of :message, :status
+    validates_inclusion_of :status, in: EffectiveLogging.statuses
 
     default_scope -> { order("#{EffectiveLogging.logs_table_name.to_s}.updated_at DESC") }
 

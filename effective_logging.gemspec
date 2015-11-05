@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.add_dependency "effective_datatables", '>= 2.0.0'
   s.add_dependency "coffee-rails"
   s.add_dependency "devise"
-  s.add_dependency "haml"
-  s.add_dependency "migrant"
+  s.add_dependency "haml-rails"
 
 end
