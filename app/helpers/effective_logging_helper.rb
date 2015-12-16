@@ -36,7 +36,7 @@ module EffectiveLoggingHelper
               elsif v.kind_of?(Array)
                 '[' + v.join(', ') + ']'
               else
-                v
+                v.to_s
               end
             end
           end
