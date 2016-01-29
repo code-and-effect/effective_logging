@@ -60,14 +60,39 @@ module EffectiveLoggingHelper
     end
   end
 
-  def format_log_details_value(value)
+  def format_log_details_value(log, key)
+    value = log.details[key]
+
     if value.kind_of?(Hash)
       tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
     elsif value.kind_of?(Array)
-      value.map { |value| simple_format(sanitize(value.to_s, :tags => ALLOWED_TAGS, :attributes => ALLOWED_ATTRIBUTES), {}, :sanitize => false) }.join('').html_safe
+      value.map { |value| effective_logging_simple_format(value) }.join.html_safe
     else
-      simple_format(sanitize(value.to_s, :tags => ALLOWED_TAGS, :attributes => ALLOWED_ATTRIBUTES), {}, :sanitize => false)
+      value = value.to_s
+
+      open = value.index('<!DOCTYPE html') || value.index('<html')
+      close = value.rindex('</html>') if open.present?
+      return effective_logging_simple_format(value) unless (open.present? && close.present?)
+
+      before = value[0...open]
+      after = value[(close+7)..-1]
+      divide = before.sub!('<hr>', '').present?
+
+      [
+        h(before).gsub("\n", '<br>'),
+        (content_tag(:hr) if divide),
+        content_tag(:iframe, '',
+          src: effective_logging.html_part_log_path(log, key: key),
+          style: 'frameborder: 0; border: 0; width: 100%; height: 100%;',
+          onload: "this.style.height=this.contentDocument.body.scrollHeight + 'px';",
+          scrolling: 'no'),
+        h(after).gsub("\n", '<br>')
+      ].compact.join.html_safe
     end
+  end
+
+  def effective_logging_simple_format(value)
+    simple_format(sanitize(value.to_s, :tags => ALLOWED_TAGS, :attributes => ALLOWED_ATTRIBUTES), {}, :sanitize => false)
   end
 
 

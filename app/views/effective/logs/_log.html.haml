@@ -16,6 +16,8 @@
         &nbsp;
         = log.created_at.strftime("%Y-%m-%d %H:%M:%S")
         = '(' + time_ago_in_words(log.created_at) + ' ago)'
+        %br
+        %br
 
       .col-lg-6
         - if log.user.present?
@@ -35,10 +37,9 @@
       - next unless value.present?
       .row
         .col-lg-12
-          %br
           %p
             %strong= "#{key.to_s.titleize}:"
-          = format_log_details_value(value)
+          = format_log_details_value(log, key)
 
     - if log.logs.present?
       .row

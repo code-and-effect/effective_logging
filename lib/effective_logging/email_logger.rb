@@ -8,7 +8,7 @@ module EffectiveLogging
       message_header.gsub!(";\r\n charset", '; charset')
 
       # Cleanup the Body
-      if (message_body = message.body.to_s).include?('<html>')
+      if (message_body = message.body.to_s).include?('<html')
         message_body.gsub!(/(\r)*\n\s*/, '')
         message_body.gsub!("<!DOCTYPE html>", '')
       end

@@ -1,6 +1,6 @@
 module Effective
   class LogsController < ApplicationController
-    skip_log_page_views
+    skip_log_page_views quiet: true
     before_filter :authenticate_user!, :only => [:index, :show] # Devise ensure logged in
 
     # This is a post from our Javascript
@@ -55,6 +55,22 @@ module Effective
       EffectiveLogging.authorized?(self, :show, @log)
     end
 
+    def html_part
+      @log = Effective::Log.find(params[:id])
+
+      EffectiveLogging.authorized?(self, :show, @log)
+
+      value = @log.details[(params[:key] || '').to_sym].to_s
+
+      open = value.index('<!DOCTYPE html') || value.index('<html')
+      close = value.rindex('</html>') if open.present?
+
+      if open.present? && close.present?
+        render text: value[open...(close+7)]
+      else
+        render text: value
+      end
+    end
 
     private
 

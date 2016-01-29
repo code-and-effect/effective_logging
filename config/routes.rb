@@ -2,7 +2,9 @@ EffectiveLogging::Engine.routes.draw do
   scope :module => 'effective' do
     # Create is our javascript POST event for EffectiveLogging from JS side
     # The show and index routes are for user specific logs
-    resources :logs, :only => [:create, :show, :index]
+    resources :logs, :only => [:create, :show, :index] do
+      member { get :html_part }
+    end
   end
 
   if defined?(EffectiveDatatables)
