@@ -27,6 +27,14 @@ module EffectiveLogging
     true
   end
 
+  def self.supressed(&block)
+    @supressed = true; yield; @supressed = false
+  end
+
+  def self.supressed?
+    @supressed == true
+  end
+
   def self.statuses
     @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
   end
