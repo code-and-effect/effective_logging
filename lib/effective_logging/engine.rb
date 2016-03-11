@@ -19,7 +19,7 @@ module EffectiveLogging
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.emails_enabled == true
         require 'effective_logging/email_logger'
-        ActionMailer::Base.register_observer(EffectiveLogging::EmailLogger)
+        ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
       end
     end
 

@@ -1,26 +1,28 @@
 module EffectiveLogging
   class EmailLogger
-    def self.delivered_email(message)
+    def self.delivering_email(message)
       return unless message.present?
 
-      # Cleanup the Header
-      message_header = message.header.to_s
-      message_header.gsub!(";\r\n charset", '; charset')
+      # collect a Hash of arguments used to invoke EffectiveLogger.success
+      logged_fields = { from: message.from.join(','), to: message.to, subject: message.subject }
 
-      # Cleanup the Body
-      if (message_body = message.body.to_s).include?('<html')
-        message_body.gsub!(/(\r)*\n\s*/, '')
-        message_body.gsub!("<!DOCTYPE html>", '')
+      # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
+      # mail(to: 'admin@example.com', subject: @post.title, log: { associated: @post })
+      if message.header['log'].present?
+        # This is a bit sketchy, but gives access to the object in Rails 4.2 anyway
+        logged_fields.merge!(message.header['log'].instance_variable_get(:@value) || {})
+
+        # Get rid of the extra header, as it should not be set in the real mail message.
+        message.header['log'] = nil
       end
 
-      (message.to || []).each do |email|
-        user = User.where(:email => email).first
+      logged_fields[:email] = "#{message.header}<hr>#{message.body}"
 
-        if user.present?
-          EffectiveLogger.success("email sent: #{message.subject}", :user => user, :recipient => email, :subject => message.subject, :email => message_header + '<hr>' + message_body)
-        else
-          EffectiveLogger.success("email sent to #{email}: #{message.subject}", :recipient => email, :subject => message.subject, :email => message_header + '<hr>' + message_body)
-        end
+      (message.to || []).each do |to|
+        logged_fields[:to] = to
+        logged_fields[:user] ||= (User.where(email: to).first rescue nil)
+
+        EffectiveLogger.success("email sent: #{message.subject}", logged_fields)
       end
     end
 
