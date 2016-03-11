@@ -98,6 +98,17 @@ This behaviour can be disabled in the config/initializers/effective_logging.rb i
 
 If the TO email address match a User, the :user will be set appropriately.
 
+You can specify additional fields to be logged via your mailer:
+
+```ruby
+def notify_admin_of_new_post(post)
+  mail(
+    to: 'admin@example.com',
+    subject: 'A new post was created',
+    log: { :associated => post, :title => post.title }
+  )
+end
+```
 
 ### Automatic Logging of User Login and Logout
 
