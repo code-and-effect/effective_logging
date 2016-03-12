@@ -9,6 +9,9 @@
     end
 
 - if log.logs_count.to_i > 0
-  = link_to "View&nbsp;(#{log.logs_count}&nbsp;more)".html_safe, show_path
+  = link_to show_path, title: 'View' do
+    %span.glyphicon.glyphicon-eye-open
+    = "(#{log.logs_count})"
 - else
-  = link_to 'View', show_path
+  = link_to show_path, title: 'View' do
+    %span.glyphicon.glyphicon-eye-open
