@@ -23,6 +23,13 @@ module EffectiveLogging
       end
     end
 
+    # Include acts_as_loggable concern and allow any ActiveRecord object to call it with log_changes()
+    initializer 'effective_logging.active_record' do |app|
+      ActiveSupport.on_load :active_record do
+        ActiveRecord::Base.extend(ActsAsLoggable::ActiveRecord)
+      end
+    end
+
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.action_controller' do |app|
       ActiveSupport.on_load :action_controller do

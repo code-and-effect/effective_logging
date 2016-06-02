@@ -89,6 +89,13 @@ log.error('record 2 failed to import', :associated => @record2)
 log.success('record 3 imported', :associated => @record3)
 ```
 
+### Model
+
+(optional) Sometimes you'd like to work with the `Effective::Log` relationship directly.  Add to your model:
+
+```ruby
+has_many :logs, class_name: Effective::Log, as: :associated
+```
 
 ### Automatic Logging of E-mails
 

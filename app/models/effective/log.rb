@@ -8,13 +8,13 @@ module Effective
     attr_accessor :prev_log
 
     # Self-Referencing relationship
-    belongs_to :parent, :class_name => 'Effective::Log', :counter_cache => true
-    has_many :logs, :dependent => :destroy, :class_name => 'Effective::Log', :foreign_key => :parent_id
+    belongs_to :parent, class_name: 'Effective::Log', counter_cache: true
+    has_many :logs, dependent: :destroy, class_name: 'Effective::Log', foreign_key: :parent_id
 
     # The user this log item is referring to
     # An associated object, if we wanna add anything extra
     belongs_to :user
-    belongs_to :associated, :polymorphic => true
+    belongs_to :associated, polymorphic: true
 
     serialize :details, Hash
 
@@ -26,17 +26,17 @@ module Effective
     #   timestamps
     # end
 
-    validates_presence_of :message, :status
-    validates_inclusion_of :status, in: EffectiveLogging.statuses
+    validates :message, presence: true
+    validates :status, presence: true, inclusion: { in: EffectiveLogging.statuses }
 
-    default_scope -> { order("#{EffectiveLogging.logs_table_name.to_s}.updated_at DESC") }
+    default_scope -> { order(updated_at: :desc) }
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
     end
 
     def details
-      ((self[:details] ||= {}) rescue {})
+      self[:details] || {}
     end
 
     # def next_log
