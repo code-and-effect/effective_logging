@@ -9,7 +9,7 @@ module Effective
 
     # Self-Referencing relationship
     belongs_to :parent, class_name: 'Effective::Log', counter_cache: true
-    has_many :logs, dependent: :destroy, class_name: 'Effective::Log', foreign_key: :parent_id
+    has_many :logs, class_name: 'Effective::Log', foreign_key: :parent_id
 
     # The user this log item is referring to
     # An associated object, if we wanna add anything extra

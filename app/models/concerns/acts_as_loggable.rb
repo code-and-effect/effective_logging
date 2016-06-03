@@ -15,7 +15,22 @@ module ActsAsLoggable
 
   included do
     has_many :logged_changes, as: :associated, class_name: Effective::Log
-    before_save :log_changes
+
+    before_save do
+      @acts_as_loggable_new_record = new_record?
+      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).saved! unless new_record?
+      true
+    end
+
+    before_destroy do
+      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!.save
+      true
+    end
+
+    after_commit do
+      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!.save if @acts_as_loggable_new_record
+      true
+    end
 
     # Parse Options
     log_changes_options = {
@@ -36,9 +51,5 @@ module ActsAsLoggable
     @logged_changes_datatable ||= Effective::Datatables::Logs.new(associated_id: id, associated_type: self.class.name)
   end
 
-  def log_changes
-    EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
-    true  # As this runs in a before_safe, we always return true just in case.
-  end
 end
 
