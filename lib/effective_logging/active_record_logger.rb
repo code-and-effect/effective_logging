@@ -1,66 +1,67 @@
 module EffectiveLogging
   class ActiveRecordLogger
-    attr_accessor :resource, :options
-
-    STATUS = 'success'
-
-    delegate :logged_changes, :attributes, :changes, :new_record?, :marked_for_destruction?, :changed?, to: :resource
+    attr_accessor :resource, :logger, :options
 
     def initialize(resource, options = {})
       @resource = resource
+      @logger = options.delete(:logger) || resource
       @options = options
 
+      binding.pry
+
       raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
-      raise ArgumentError.new('resource must respond to logged_changes') unless resource.respond_to?(:logged_changes)
+      raise ArgumentError.new('logger must respond to logged_changes') unless logger.respond_to?(:logged_changes)
     end
 
     def execute!
-      binding.pry
-
-      if new_record?
+      if resource.new_record?
         created
-      elsif marked_for_destruction?
+      elsif resource.marked_for_destruction?
         destroyed
-      elsif changed?
+      elsif resource.changed?
         updated
+      else
+        # No action
       end
     end
 
     protected
 
     def created
-      logged_changes.build(status: STATUS, message: 'Created', details: applicable(attributes))
+      log('Created', applicable(resource.attributes))
     end
 
     def destroyed
-      logged_changes.build(status: STATUS, message: 'Deleted', details: applicable(attributes))
+      log('Deleted', applicable(resource.attributes))
     end
 
     def updated
-      applicable(changes).each do |attribute, (before, after)|
-        after.present? ? attribute_changed(attribute, before, after) : attribute_set(attribute, before)
+      applicable(resource.changes).each do |attribute, (before, after)|
+        if after.present?
+          log("#{attribute.titleize} changed from '#{before}' to '#{after}'", { attribute: attribute, before: before, after: after })
+        else
+          log("#{attribute.titleize} set to '#{value}'", { attribute: attribute, value: value })
+        end
       end
 
-      logged_changes.build(status: STATUS, message: 'Updated', details: applicable(attributes))
-    end
+      # Log changes on all accepts_as_nested_parameters has_many associations
+      (resource.class.try(:reflect_on_all_autosave_associations) || []).each do |association|
+        child_name = association.name.to_s.singularize.titleize
 
-    def attribute_changed(attribute, before, after)
-      logged_changes.build(
-        status: STATUS,
-        message: "#{attribute.titleize} changed from '#{before}' to '#{after}'",
-        details: { attribute: attribute, before: before, after: after }
-      )
-    end
+        resource.send(association.name).each_with_index do |child, index|
+          ActiveRecordLogger.new(child, options.merge(logger: logger, prefix: "#{child_name} ##{index}: ")).execute!
+        end
 
-    def attribute_set(attribute, value)
-      logged_changes.build(
-        status: STATUS,
-        message: "#{attribute.titleize} set to '#{value}'",
-        details: { attribute: attribute, value: value }
-      )
+      end
+
+      log('Updated', applicable(resource.attributes))
     end
 
     private
+
+    def log(message, details = {})
+      logger.logged_changes.build(status: 'success', message: "#{options[:prefix]}#{message}", details: details)
+    end
 
     def applicable(attributes)
       atts = if options[:only].present?
