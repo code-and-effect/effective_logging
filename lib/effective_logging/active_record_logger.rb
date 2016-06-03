@@ -3,34 +3,34 @@ module EffectiveLogging
     attr_accessor :resource, :logger, :depth, :options
 
     def initialize(resource, options = {})
+      raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
+      raise ArgumentError.new('logger must respond to logged_changes') unless (options[:logger] || resource).respond_to?(:logged_changes)
+
       @resource = resource
       @logger = options.delete(:logger) || resource
       @depth = options.delete(:depth) || 0
       @options = options
-
-      raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
-      raise ArgumentError.new('logger must respond to logged_changes') unless logger.respond_to?(:logged_changes)
     end
 
-    def execute!
+    def execute
       if resource.new_record?
-        created!
+        created
       elsif resource.marked_for_destruction?
-        destroyed!
+        destroyed
       else
-        saved!
+        updated
       end
     end
 
-    def created!
+    def created
       log('Created', applicable(attributes))
     end
 
-    def destroyed!
+    def destroyed
       log('Deleted', applicable(attributes))
     end
 
-    def saved!
+    def updated
       applicable(changes).each do |attribute, (before, after)|
         if after.present?
           log("#{attribute.titleize} changed from '#{before}' to '#{after}'", { attribute: attribute, before: before, after: after })
@@ -44,7 +44,7 @@ module EffectiveLogging
         child_name = association.name.to_s.singularize.titleize
 
         resource.send(association.name).each_with_index do |child, index|
-          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute!
+          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute
         end
       end
 
