@@ -22,7 +22,6 @@ module ActsAsLoggable
       true
     end
 
-    # We log a to be deleted record completely here
     before_destroy do
       EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
       true

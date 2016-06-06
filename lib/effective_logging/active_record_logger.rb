@@ -12,6 +12,7 @@ module EffectiveLogging
       @options = options
     end
 
+    # execute! is called when we recurse, otherwise the following methods are best called individually
     def execute!
       if resource.new_record?
         created!
@@ -22,18 +23,22 @@ module EffectiveLogging
       end
     end
 
-    def created!
-      log('Created', applicable(attributes))
-    end
-
+    # before_destroy
     def destroyed!
       log('Deleted', applicable(attributes))
     end
 
+    # after_commit
+    def created!
+      log('Created', applicable(attributes))
+    end
+
+    # after_commit
     def updated!
       log('Updated', applicable(attributes))
     end
 
+    # before_save
     def changed!
       applicable(changes).each do |attribute, (before, after)|
         if after.present?
@@ -88,7 +93,7 @@ module EffectiveLogging
         end
       end
 
-     changes
+      changes
     end
 
     private
