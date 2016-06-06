@@ -37,4 +37,8 @@ module EffectiveLogging
     @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
   end
 
+  def self.logged_changes_status
+    'logged_change'.freeze
+  end
+
 end

@@ -100,12 +100,13 @@ module EffectiveLogging
 
     def log(message, details = {})
       logger.logged_changes.build(
-        status: 'success',
+        status: EffectiveLogging.logged_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details
       ).tap { |log| log.save }
     end
 
+    # TODO: Make this work better with nested objects
     def applicable(attributes)
       atts = if options[:only].present?
         attributes.slice(*options[:only])

@@ -27,7 +27,7 @@ module Effective
     # end
 
     validates :message, presence: true
-    validates :status, presence: true, inclusion: { in: EffectiveLogging.statuses }
+    validates :status, presence: true, inclusion: { in: (EffectiveLogging.statuses + [EffectiveLogging.logged_changes_status]) }
 
     default_scope -> { order(updated_at: :desc) }
 
