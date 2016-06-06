@@ -12,25 +12,29 @@ module EffectiveLogging
       @options = options
     end
 
-    def execute
+    def execute!
       if resource.new_record?
-        created
+        created!
       elsif resource.marked_for_destruction?
-        destroyed
+        destroyed!
       else
-        updated
+        changed!
       end
     end
 
-    def created
+    def created!
       log('Created', applicable(attributes))
     end
 
-    def destroyed
+    def destroyed!
       log('Deleted', applicable(attributes))
     end
 
-    def updated
+    def updated!
+      log('Updated', applicable(attributes))
+    end
+
+    def changed!
       applicable(changes).each do |attribute, (before, after)|
         if after.present?
           log("#{attribute.titleize} changed from '#{before}' to '#{after}'", { attribute: attribute, before: before, after: after })
@@ -44,11 +48,9 @@ module EffectiveLogging
         child_name = association.name.to_s.singularize.titleize
 
         resource.send(association.name).each_with_index do |child, index|
-          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute
+          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute!
         end
       end
-
-      log('Updated', applicable(attributes)) if depth == 0
     end
 
     def attributes
@@ -77,22 +79,26 @@ module EffectiveLogging
     end
 
     def changes
-      changed = resource.changes
+      changes = resource.changes
 
       # Log to_s changes on all belongs_to associations
       (resource.class.try(:reflect_on_all_associations, :belongs_to) || []).each do |association|
-        if (change = changed.delete(association.foreign_key)).present?
-          changed[association.name] = [association.klass.find_by_id(change.first), resource.send(association.name)]
+        if (change = changes.delete(association.foreign_key)).present?
+          changes[association.name] = [association.klass.find_by_id(change.first), resource.send(association.name)]
         end
       end
 
-      changed
+     changes
     end
 
     private
 
     def log(message, details = {})
-      logger.logged_changes.build(status: 'success', message: "#{"\t" * depth}#{options[:prefix]}#{message}", details: details)
+      logger.logged_changes.build(
+        status: 'success',
+        message: "#{"\t" * depth}#{options[:prefix]}#{message}",
+        details: details
+      ).tap { |log| log.save }
     end
 
     def applicable(attributes)

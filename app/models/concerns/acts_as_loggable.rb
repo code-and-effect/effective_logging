@@ -18,22 +18,22 @@ module ActsAsLoggable
 
     before_save do
       @acts_as_loggable_new_record = new_record?
-      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated unless new_record?
+      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).changed! unless @acts_as_loggable_new_record
       true
     end
 
-    after_save do
-      puts 'after save'
-      binding.pry
-    end
-
+    # We log a to be deleted record completely here
     before_destroy do
-      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed.save
+      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
       true
     end
 
     after_commit do
-      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created.save if @acts_as_loggable_new_record
+      if @acts_as_loggable_new_record
+        EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
+      else
+        EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
+      end
       true
     end
 
