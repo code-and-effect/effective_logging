@@ -100,7 +100,8 @@ module EffectiveLogging
 
     def log(message, details = {})
       logger.logged_changes.build(
-        status: EffectiveLogging.logged_changes_status,
+        user: EffectiveLogging.log_changes_user,
+        status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details
       ).tap { |log| log.save }

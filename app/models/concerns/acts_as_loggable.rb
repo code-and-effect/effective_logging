@@ -14,7 +14,7 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { where(status: EffectiveLogging.logged_changes_status) }, as: :associated, class_name: Effective::Log
+    has_many :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: Effective::Log
 
     before_save do
       @acts_as_loggable_new_record = new_record?
@@ -51,14 +51,14 @@ module ActsAsLoggable
 
   # Regular instance methods
 
-  def logged_changes_datatable
+  def log_changes_datatable
     if persisted?
-      @logged_changes_datatable ||= (
+      @log_changes_datatable ||= (
         Effective::Datatables::Logs.new(
           associated_id: id,
           associated_type: self.class.name,
           status: false,
-          logged_changes: true
+          log_changes: true
         )
       )
     end

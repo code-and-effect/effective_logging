@@ -15,7 +15,7 @@ if defined?(EffectiveDatatables)
           end
 
           unless attributes[:status] == false
-            table_column :status, filter: { type: :select, values: (EffectiveLogging.statuses + [EffectiveLogging.logged_changes_status]) }
+            table_column :status, filter: { type: :select, values: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
           end
 
           table_column :message do |log|
@@ -52,8 +52,8 @@ if defined?(EffectiveDatatables)
             collection = collection.where(associated_id: attributes[:associated_id], associated_type: attributes[:associated_type])
           end
 
-          if attributes[:logged_changes]
-            collection = collection.where(status: EffectiveLogging.logged_changes_status)
+          if attributes[:log_changes]
+            collection = collection.where(status: EffectiveLogging.log_changes_status)
           end
 
           if attributes[:associated]

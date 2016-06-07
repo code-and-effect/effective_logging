@@ -33,6 +33,13 @@ module EffectiveLogging
     end
 
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    initializer 'effective_logging.log_changes_action_controller' do |app|
+      ActiveSupport.on_load :action_controller do
+        ActionController::Base.include(EffectiveLogging::LogChangesUser)
+      end
+    end
+
+    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.action_controller' do |app|
       ActiveSupport.on_load :action_controller do
         ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
