@@ -1,10 +1,9 @@
 require 'haml-rails'
 require 'effective_logging/engine'
 require 'effective_logging/version'
-require 'effective_logging/log_page_views'
-require 'effective_logging/user_logger'
 
 module EffectiveLogging
+
   # The following are all valid config keys
   mattr_accessor :logs_table_name
   mattr_accessor :use_active_admin
@@ -37,6 +36,19 @@ module EffectiveLogging
 
   def self.statuses
     @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
+  end
+
+  def self.log_changes_status
+    'logged change'.freeze
+  end
+
+  # This is set by the "set_log_changes_user" before_filter.
+  def self.log_changes_user=(user)
+    @log_changes_user = user
+  end
+
+  def self.log_changes_user
+    @log_changes_user
   end
 
 end

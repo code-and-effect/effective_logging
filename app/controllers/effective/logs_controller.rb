@@ -42,14 +42,14 @@ module Effective
 
     # This is the User show event
     def show
-      @log = Effective::Log.where(:user_id => current_user.id).includes(:logs).find(params[:id])
-      @log.next_log = Effective::Log.unscoped.where(:user_id => current_user.id).order(:id).where(:parent_id => @log.parent_id).where('id > ?', @log.id).first
-      @log.prev_log = Effective::Log.unscoped.where(:user_id => current_user.id).order(:id).where(:parent_id => @log.parent_id).where('id < ?', @log.id).last
+      @log = Effective::Log.includes(:logs).find(params[:id])
+      @log.next_log = Effective::Log.unscoped.order(:id).where(parent_id: @log.parent_id).where('id > ?', @log.id).first
+      @log.prev_log = Effective::Log.unscoped.order(:id).where(parent_id: @log.parent_id).where('id < ?', @log.id).last
 
       @page_title = "Log ##{@log.to_param}"
 
       if @log.logs.present?
-        @log.datatable = Effective::Datatables::Logs.new(:user_id => current_user.id, :log_id => @log.id) if defined?(EffectiveDatatables)
+        @log.datatable = Effective::Datatables::Logs.new(log_id: @log.id) if defined?(EffectiveDatatables)
       end
 
       EffectiveLogging.authorized?(self, :show, @log)

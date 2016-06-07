@@ -15,11 +15,16 @@ if defined?(EffectiveDatatables)
           end
 
           unless attributes[:status] == false
-            table_column :status, filter: { type: :select, values: EffectiveLogging.statuses }
+            table_column :status, filter: { type: :select, values: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
           end
 
-          table_column :message
+          table_column :message do |log|
+            log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
+          end
+
           table_column :logs_count, visible: false
+
+          table_column :associated, filter: false, sortable: false, visible: false
 
           table_column :details, visible: false, sortable: false do |log|
             tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')
@@ -45,6 +50,10 @@ if defined?(EffectiveDatatables)
 
           if attributes[:associated_id] && attributes[:associated_type]
             collection = collection.where(associated_id: attributes[:associated_id], associated_type: attributes[:associated_type])
+          end
+
+          if attributes[:log_changes]
+            collection = collection.where(status: EffectiveLogging.log_changes_status)
           end
 
           if attributes[:associated]

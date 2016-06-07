@@ -89,6 +89,13 @@ log.error('record 2 failed to import', :associated => @record2)
 log.success('record 3 imported', :associated => @record3)
 ```
 
+### Model
+
+(optional) Sometimes you'd like to work with the `Effective::Log` relationship directly.  Add to your model:
+
+```ruby
+has_many :logs, class_name: Effective::Log, as: :associated
+```
 
 ### Automatic Logging of E-mails
 
@@ -184,6 +191,46 @@ end
 
 Similarly, skip_log_page_views also accepts any options that a before_filter would accept.
 
+
+### Logging ActiveRecord changes
+
+All changes made to an ActiveRecord object can be logged.
+
+This logging includes the resource's base attributes, all autosaved associations (any accepts_nested_attributes has_manys) and the string representation of all belongs_tos.
+
+It will recurse through all accepts_nested_attributes has_many's and handle any number of child objects.
+
+Add to your model:
+
+```ruby
+class Post < ActiveRecord::Base
+  log_changes
+end
+```
+
+And to your controller:
+
+```ruby
+class ApplicationController < ActionController::Base
+  set_log_changes_user
+end
+```
+
+Then to see the log for this resource, on any view:
+
+```erb
+<%= render_datatable(@post.log_changes_datatable) %>
+```
+
+The `log_changes` mixin sets up `before_save`, `before_destroy` and `after_commit` hooks to record both an activity log, and an audit log of all changes.
+
+Each changed attribute will have its before and after values logged to form an activity log.
+
+And on each create / destroy / update, a full dump of all current attributes is saved, forming an audit log.
+
+There is some initial support for passing `only`, `except`, and `additionally` to the mixin to customize what attributes are saved.
+
+Define your model with `log_changes additionally: [:method1, :method2]` to also log the value of methods.
 
 ### Logging From JavaScript
 

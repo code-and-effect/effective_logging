@@ -2,6 +2,8 @@ module EffectiveLogging
   class Engine < ::Rails::Engine
     engine_name 'effective_logging'
 
+    config.autoload_paths += Dir["#{config.root}/lib/"]
+
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
       eval File.read("#{config.root}/lib/generators/templates/effective_logging.rb")
@@ -20,6 +22,20 @@ module EffectiveLogging
       if EffectiveLogging.emails_enabled == true
         require 'effective_logging/email_logger'
         ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
+      end
+    end
+
+    # Include acts_as_loggable concern and allow any ActiveRecord object to call it with log_changes()
+    initializer 'effective_logging.active_record' do |app|
+      ActiveSupport.on_load :active_record do
+        ActiveRecord::Base.extend(ActsAsLoggable::ActiveRecord)
+      end
+    end
+
+    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    initializer 'effective_logging.log_changes_action_controller' do |app|
+      ActiveSupport.on_load :action_controller do
+        ActionController::Base.include(EffectiveLogging::LogChangesUser)
       end
     end
 

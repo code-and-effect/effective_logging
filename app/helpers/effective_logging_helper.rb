@@ -64,7 +64,7 @@ module EffectiveLoggingHelper
     value = log.details[key]
 
     if value.kind_of?(Hash)
-      tableize_hash(value, :class => 'table', :style => 'width: 50%', :th => true)
+      tableize_hash(value, :class => 'table', :th => true)
     elsif value.kind_of?(Array)
       value.map { |value| effective_logging_simple_format(value) }.join.html_safe
     else
