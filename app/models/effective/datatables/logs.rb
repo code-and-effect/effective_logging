@@ -32,7 +32,9 @@ if defined?(EffectiveDatatables)
 
           table_column :updated_at, visible: false
 
-          actions_column partial: 'admin/logs/actions', partial_local: :log
+          unless attributes[:actions] == false
+            actions_column partial: 'admin/logs/actions', partial_local: :log
+          end
         end
 
         # A nil attributes[:log_id] means give me all the top level log entries
