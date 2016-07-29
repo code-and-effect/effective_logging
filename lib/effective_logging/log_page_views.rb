@@ -40,9 +40,9 @@ module EffectiveLogging
         user = (current_user rescue nil)
 
         if self.class.log_page_views_opts[:details] == false
-          EffectiveLogger.info("page view: #{request.request_method} #{request.path}", :user => user)
+          ::EffectiveLogger.info("page view: #{request.request_method} #{request.path}", :user => user)
         else
-          EffectiveLogger.info(
+          ::EffectiveLogger.info(
             "page view: #{request.request_method} #{request.path}",
             :user => user,
             :params => request.params.reject { |k, v| (k == 'controller' || k == 'action') },
