@@ -18,7 +18,11 @@ module EffectiveLogging
         self.log_page_views_opts = logging_options
 
         # Set up the after_filter to do page logging
-        after_filter :effective_logging_log_page_view, filter_options
+        if respond_to?(:after_action)
+          after_action :effective_logging_log_page_view, filter_options
+        else
+          after_filter :effective_logging_log_page_view, filter_options
+        end
       end
 
       def skip_log_page_views(options = {})
@@ -28,7 +32,11 @@ module EffectiveLogging
 
     module ClassMethods
       def skip_log_page_views(options = {})
-        before_filter :skip_log_page_view, options
+        if respond_to?(:before_action)
+          before_action :skip_log_page_view, options
+        else
+          before_filter :skip_log_page_view, options
+        end
       end
     end
 
@@ -45,7 +53,7 @@ module EffectiveLogging
           ::EffectiveLogger.info(
             "page view: #{request.request_method} #{request.path}",
             :user => user,
-            :params => request.params.reject { |k, v| (k == 'controller' || k == 'action') },
+            :params => request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
             :format => (request.format.to_s == 'text/html' ? nil : request.format.to_s),
             :referrer => request.referrer,
             :user_agent => request.user_agent
