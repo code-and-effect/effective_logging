@@ -232,6 +232,28 @@ There is some initial support for passing `only`, `except`, and `additionally` t
 
 Define your model with `log_changes additionally: [:method1, :method2]` to also log the value of methods.
 
+Apply your own formatting to the logged title of each attribute by creating an instance method on the resource:
+
+```ruby
+# Format the title of this attribute. Return nil to use the default attribute.titleize
+def log_changes_formatted_attribute(attribute)
+  attribute.downcase
+end
+```
+
+Apply your own formatting to the logged before and after values of each attribute by creating an instance method on the resource:
+
+```ruby
+# Format the value of this attribute. Return nil to use the default to_s
+def log_changes_formatted_value(attribute, value)
+  if ['cost'].include?(attribute)
+    ActionController::Base.helpers.number_to_currency(value)
+  elsif ['percentage'].include?(attribute)
+    ActionController::Base.helpers.number_to_percentage(value)
+  end
+end
+```
+
 ### Logging From JavaScript
 
 First, require the javascript in your application.js:

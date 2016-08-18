@@ -51,6 +51,16 @@ module ActsAsLoggable
 
   # Regular instance methods
 
+  # Format the title of this attribute. Return nil to use the default attribute.titleize
+  def log_changes_formatted_attribute(attribute)
+    # Intentionally does nothing
+  end
+
+  # Format the value of this attribute. Return nil to use the default to_s
+  def log_changes_formatted_value(attribute, value)
+    # Intentionally does nothing
+  end
+
   def log_changes_datatable
     if persisted?
       @log_changes_datatable ||= (

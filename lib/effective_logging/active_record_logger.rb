@@ -2,6 +2,8 @@ module EffectiveLogging
   class ActiveRecordLogger
     attr_accessor :resource, :logger, :depth, :options
 
+    BLANK = "''"
+
     def initialize(resource, options = {})
       raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
       raise ArgumentError.new('logger must respond to logged_changes') unless (options[:logger] || resource).respond_to?(:logged_changes)
@@ -41,10 +43,19 @@ module EffectiveLogging
     # before_save
     def changed!
       applicable(changes).each do |attribute, (before, after)|
+        if resource.respond_to?(:log_changes_formatted_value)
+          before = resource.log_changes_formatted_value(attribute, before) || before
+          after = resource.log_changes_formatted_value(attribute, after) || after
+        end
+
+        attribute = if resource.respond_to?(:log_changes_formatted_attribute)
+          resource.log_changes_formatted_attribute(attribute)
+        end || attribute.titleize
+
         if after.present?
-          log("#{attribute.titleize} changed from '#{before}' to '#{after}'", { attribute: attribute, before: before, after: after })
+          log("#{attribute} changed from #{before.presence || BLANK} to #{after.presence || BLANK}", { attribute: attribute, before: before, after: after })
         else
-          log("#{attribute.titleize} set to '#{before}'", { attribute: attribute, value: before })
+          log("#{attribute} set to #{before || BLANK}", { attribute: attribute, value: before })
         end
       end
 
