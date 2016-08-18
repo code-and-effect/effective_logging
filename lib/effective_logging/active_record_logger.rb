@@ -128,7 +128,7 @@ module EffectiveLogging
         attributes
       end
 
-      options[:additionally].each do |attribute|
+      (options[:additionally] || []).each do |attribute|
         value = (resource.send(attribute) rescue :effective_logging_nope)
         next if attributes[attribute].present? || value == :effective_logging_nope
 
