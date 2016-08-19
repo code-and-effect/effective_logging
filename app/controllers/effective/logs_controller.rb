@@ -1,7 +1,13 @@
 module Effective
   class LogsController < ApplicationController
     skip_log_page_views quiet: true
-    before_filter :authenticate_user!, :only => [:index, :show] # Devise ensure logged in
+
+    if respond_to?(:before_action) # Devise
+      before_action :authenticate_user!, only: [:index, :show]
+    else
+      before_filter :authenticate_user!, only: [:index, :show]
+    end
+
 
     # This is a post from our Javascript
     def create
