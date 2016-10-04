@@ -48,7 +48,7 @@ module EffectiveLogging
 
     # This has to be run after initialization or User hasn't been loaded yet
     config.after_initialize do
-      if EffectiveLogging.user_logins_enabled == true
+      if EffectiveLogging.user_logins_enabled || EffectiveLogging.user_logouts_enabled
         ActiveSupport.on_load :active_record do
           if defined?(Devise)
             EffectiveLogging::UserLogger.create_warden_hooks()

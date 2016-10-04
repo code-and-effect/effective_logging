@@ -42,5 +42,6 @@ EffectiveLogging.setup do |config|
 
   # Log all successful user login attempts
   config.user_logins_enabled = true
+  config.user_logouts_enabled = false
 
 end

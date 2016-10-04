@@ -14,6 +14,7 @@ module EffectiveLogging
 
   mattr_accessor :emails_enabled
   mattr_accessor :user_logins_enabled
+  mattr_accessor :user_logouts_enabled
 
   def self.setup
     yield self
