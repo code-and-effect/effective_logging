@@ -84,7 +84,7 @@ module EffectiveLoggingHelper
         content_tag(:iframe, '',
           src: effective_logging.html_part_log_path(log, key: key),
           style: 'frameborder: 0; border: 0; width: 100%; height: 100%;',
-          onload: "this.style.height=this.contentDocument.body.scrollHeight + 'px';",
+          onload: "this.style.height=(this.contentDocument.body.scrollHeight + 30) + 'px';",
           scrolling: 'no'),
         h(after).gsub("\n", '<br>')
       ].compact.join.html_safe

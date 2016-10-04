@@ -16,7 +16,9 @@ module EffectiveLogging
         message.header['log'] = nil
       end
 
-      logged_fields[:email] = "#{message.header}<hr>#{message.body}"
+      body = (message.body.try(:parts) || []).find { |part| part.content_type.to_s.downcase.include?('text/html') }
+
+      logged_fields[:email] = "#{message.header}<hr>#{(body.presence || message.body)}"
 
       (message.to || []).each do |to|
         logged_fields[:to] = to
