@@ -63,7 +63,7 @@ module EffectiveLogging
       (resource.class.try(:reflect_on_all_autosave_associations) || []).each do |association|
         child_name = association.name.to_s.singularize.titleize
 
-        resource.send(association.name).each_with_index do |child, index|
+        Array(resource.send(association.name)).each_with_index do |child, index|
           ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute!
         end
       end
@@ -86,7 +86,7 @@ module EffectiveLogging
       (resource.class.try(:reflect_on_all_autosave_associations) || []).each do |association|
         attributes[association.name] = {}
 
-        resource.send(association.name).each_with_index do |child, index|
+        Array(resource.send(association.name)).each_with_index do |child, index|
           attributes[association.name][index+1] = ActiveRecordLogger.new(child, options.merge(logger: logger)).attributes
         end
       end
@@ -125,7 +125,7 @@ module EffectiveLogging
       elsif options[:except].present?
         attributes.except(*options[:except])
       else
-        attributes
+        attributes.except(:updated_at, :created_at)
       end
 
       (options[:additionally] || []).each do |attribute|

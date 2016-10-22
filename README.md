@@ -212,7 +212,7 @@ And to your controller:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  set_log_changes_user
+  before_action :set_log_changes_user
 end
 ```
 
