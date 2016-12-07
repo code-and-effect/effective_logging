@@ -1,7 +1,10 @@
 if defined?(ActiveAdmin)
 
   ActiveAdmin.register Effective::Log do
-    menu :label => 'Logs', :if => proc { EffectiveLogging.authorized?(controller, :manage, Effective::Log.new()) rescue false }
+    menu :label => 'Logs', :if => proc {
+      (EffectiveLogging.authorized?(controller, :manage, Effective::Log.new()) rescue false) &&
+      (EffectiveLogging.authorized?(controller, :admin, :effective_logging) rescue false)
+    }
 
     actions :index, :show
 

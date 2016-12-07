@@ -301,6 +301,14 @@ Then you should be able to visit:
 link_to 'Logs', effective_logging.admin_logs_path   # /admin/logs
 ```
 
+But you may need to add the permission (using CanCan):
+
+```ruby
+can :manage, Effective::Log
+can :admin, :effective_logging
+```
+
+
 ### Build an All Logs Screen
 
 If you don't want to use the builtin Admin screen, and would rather render the effective_datatable of logs elsewhere
@@ -334,9 +342,6 @@ In your controller:
 ## License
 
 MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
-
-Code and Effect is the product arm of [AgileStyle](http://www.agilestyle.com/), an Edmonton-based shop that specializes in building custom web applications with Ruby on Rails.
-
 
 ## Testing
 

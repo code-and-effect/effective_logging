@@ -12,6 +12,7 @@ module Admin
       @page_title = 'Logs'
 
       EffectiveLogging.authorized?(self, :index, Effective::Log)
+      EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
 
     def show
@@ -26,6 +27,7 @@ module Admin
       end
 
       EffectiveLogging.authorized?(self, :show, @log)
+      EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
   end
 end
