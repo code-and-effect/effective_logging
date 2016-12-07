@@ -1,4 +1,6 @@
-%h2= @page_title
+%h1.effective-heading= @page_title
 
-= render_datatable @datatable do
+- if @datatable.present?
+  = render_datatable(@datatable)
+- else
   %p You have no previous recorded activity

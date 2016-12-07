@@ -10,7 +10,7 @@ if defined?(ActiveAdmin)
 
     controller do
       def index
-        @datatable = Effective::Datatables::Logs.new(:active_admin => true) if defined?(EffectiveDatatables)
+        @datatable = Effective::Datatables::Logs.new(:active_admin => true)
         render :file => 'active_admin/effective_logging/logs/index', :layout => 'active_admin'
       end
 

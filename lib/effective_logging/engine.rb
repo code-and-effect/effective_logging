@@ -6,7 +6,7 @@ module EffectiveLogging
 
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
-      eval File.read("#{config.root}/lib/generators/templates/effective_logging.rb")
+      eval File.read("#{config.root}/config/effective_logging.rb")
     end
 
     # ActiveAdmin (optional)

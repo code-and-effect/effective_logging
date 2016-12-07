@@ -40,7 +40,7 @@ module Effective
 
     # This is the User index event
     def index
-      @datatable = Effective::Datatables::Logs.new(:user_id => current_user.id) if defined?(EffectiveDatatables)
+      @datatable = Effective::Datatables::Logs.new(:user_id => current_user.id)
       @page_title = 'My Activity'
 
       EffectiveLogging.authorized?(self, :index, Effective::Log.new(:user_id => current_user.id))

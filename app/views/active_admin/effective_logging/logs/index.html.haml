@@ -1,5 +1,7 @@
 .fluid-container
   .row
     .col-sm-12
-      = render_datatable @datatable do
+      - if @datatable.present?
+        = render_datatable(@datatable)
+      - else
         %p There are no logs

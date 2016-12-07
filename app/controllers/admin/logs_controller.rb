@@ -8,7 +8,7 @@ module Admin
     helper EffectiveLoggingHelper
 
     def index
-      @datatable = Effective::Datatables::Logs.new() if defined?(EffectiveDatatables)
+      @datatable = Effective::Datatables::Logs.new()
       @page_title = 'Logs'
 
       EffectiveLogging.authorized?(self, :index, Effective::Log)
