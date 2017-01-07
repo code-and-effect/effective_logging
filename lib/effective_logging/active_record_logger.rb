@@ -26,18 +26,23 @@ module EffectiveLogging
     end
 
     # before_destroy
+    def trashed!
+      log('Trashed', status: EffectiveLogging.trashable_status, details: applicable(attributes))
+    end
+
+    # before_destroy
     def destroyed!
-      log('Deleted', applicable(attributes))
+      log('Deleted', details: applicable(attributes))
     end
 
     # after_commit
     def created!
-      log('Created', applicable(attributes))
+      log('Created', details: applicable(attributes))
     end
 
     # after_commit
     def updated!
-      log('Updated', applicable(attributes))
+      log('Updated', details: applicable(attributes))
     end
 
     # before_save
@@ -53,9 +58,9 @@ module EffectiveLogging
         end || attribute.titleize
 
         if after.present?
-          log("#{attribute} changed from #{before.presence || BLANK} to #{after.presence || BLANK}", { attribute: attribute, before: before, after: after })
+          log("#{attribute} changed from #{before.presence || BLANK} to #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
         else
-          log("#{attribute} set to #{before || BLANK}", { attribute: attribute, value: before })
+          log("#{attribute} set to #{before || BLANK}", details: { attribute: attribute, value: before })
         end
       end
 
@@ -109,10 +114,10 @@ module EffectiveLogging
 
     private
 
-    def log(message, details = {})
+    def log(message, status: EffectiveLogging.log_changes_status, details: {})
       logger.logged_changes.build(
         user: EffectiveLogging.log_changes_user,
-        status: EffectiveLogging.log_changes_status,
+        status: status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details
       ).tap { |log| log.save }

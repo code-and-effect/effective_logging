@@ -1,0 +1,12 @@
+:ruby
+  show_path =
+    if datatables_active_admin_path?
+      admin_effective_trash_path(trash)
+    elsif datatables_admin_path?
+      effective_trash.admin_trash_path(trash)
+    else
+      effective_trash.trash_path(trash)
+    end
+
+= link_to show_path, title: 'View' do
+  %span.glyphicon.glyphicon-eye-open

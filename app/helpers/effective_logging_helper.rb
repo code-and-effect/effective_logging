@@ -15,6 +15,7 @@ module EffectiveLoggingHelper
   def render_log(log)
     render(:partial => 'effective/logs/log', :locals => {:log => log})
   end
+  alias_method :render_trash, :render_log
 
   def parents_of_log(log)
     parents = [log.parent]

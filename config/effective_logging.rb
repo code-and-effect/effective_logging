@@ -29,6 +29,14 @@ EffectiveLogging.setup do |config|
   # Admin Screens Layout Settings
   config.layout = 'application'   # All EffectiveLogging controllers will use this layout
 
+  # config.layout = {
+  #   logs: 'application',
+  #   admin_logs: 'admin',
+
+  #   trash: 'application',
+  #   admin_trash: 'admin'
+  # }
+
   # All statuses defined here, as well as 'info', 'success', and 'error' (hardcoded) will be created as
   # EffectiveLogger.info('my message') macros
   config.additional_statuses = []

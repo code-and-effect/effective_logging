@@ -43,6 +43,10 @@ module EffectiveLogging
     'logged change'.freeze
   end
 
+  def self.trashable_status
+    'Trash'.freeze
+  end
+
   # This is set by the "set_log_changes_user" before_filter.
   def self.log_changes_user=(user)
     @log_changes_user = user

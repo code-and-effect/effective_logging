@@ -29,6 +29,7 @@ module EffectiveLogging
     initializer 'effective_logging.active_record' do |app|
       ActiveSupport.on_load :active_record do
         ActiveRecord::Base.extend(ActsAsLoggable::ActiveRecord)
+        ActiveRecord::Base.extend(ActsAsTrashable::ActiveRecord)
       end
     end
 
