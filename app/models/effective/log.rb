@@ -31,6 +31,19 @@ module Effective
 
     default_scope -> { order(updated_at: :desc) }
 
+    scope :logged_changes, -> { where(status: EffectiveLogging.log_changes_status)}
+    scope :changes, -> { where(status: EffectiveLogging.log_changes_status)}
+    scope :trash, -> { where(status: EffectiveLogging.trashable_status)}
+
+    def to_s
+      case status
+      when EffectiveLogging.trashable_status
+        [associated_type, associated_id].join(' ').presence || 'New Trash item'
+      else
+        "Log #{id}"
+      end
+    end
+
     def log(message, status = EffectiveLogging.statuses.first, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
     end

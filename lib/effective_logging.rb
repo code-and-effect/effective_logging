@@ -44,7 +44,7 @@ module EffectiveLogging
   end
 
   def self.trashable_status
-    'Trash'.freeze
+    'trashed'.freeze
   end
 
   # This is set by the "set_log_changes_user" before_filter.

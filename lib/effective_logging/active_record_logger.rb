@@ -27,7 +27,7 @@ module EffectiveLogging
 
     # before_destroy
     def trashed!
-      log('Trashed', status: EffectiveLogging.trashable_status, details: applicable(attributes))
+      log((resource.to_s rescue ''), status: EffectiveLogging.trashable_status, details: applicable(attributes))
     end
 
     # before_destroy

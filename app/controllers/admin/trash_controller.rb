@@ -10,25 +10,18 @@ module Admin
     helper EffectiveLoggingHelper
 
     def index
-      @datatable = Effective::Datatables::Logs.new()
-      @page_title = 'Logs'
+      @datatable = Effective::Datatables::Trash.new()
+      @page_title = 'Trash'
 
       EffectiveLogging.authorized?(self, :index, Effective::Log)
       EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
 
     def show
-      @log = Effective::Log.includes(:logs).find(params[:id])
-      @log.next_log = Effective::Log.unscoped.order(:id).where(:parent_id => @log.parent_id).where('id > ?', @log.id).first
-      @log.prev_log = Effective::Log.unscoped.order(:id).where(:parent_id => @log.parent_id).where('id < ?', @log.id).last
+      @trash = Effective::Log.trash.find(params[:id])
+      @page_title = "Trash #{@trash.to_s}"
 
-      @page_title = "Log ##{@log.to_param}"
-
-      if @log.logs.present?
-        @log.datatable = Effective::Datatables::Trash.new(log_id: @log.id) if defined?(EffectiveDatatables)
-      end
-
-      EffectiveLogging.authorized?(self, :show, @log)
+      EffectiveLogging.authorized?(self, :show, @trash)
       EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
   end
