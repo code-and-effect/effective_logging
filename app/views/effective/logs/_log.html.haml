@@ -29,7 +29,7 @@
           %strong User:
           &nbsp;
           = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
-        - if log.associated.present?
+        - if (log.associated.present? rescue false)
           %br
           %strong Regarding:
           &nbsp;
