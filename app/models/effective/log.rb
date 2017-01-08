@@ -52,6 +52,13 @@ module Effective
       self[:details] || {}
     end
 
+    # So this is a Trash item
+    # When we delete ourselves, we restore this trash item first
+    def restore_trashable!
+      raise 'no attributes to restore from' unless details.kind_of?(Hash) && details[:attributes].present?
+      associated_type.constantize.new(details[:attributes]).save!
+    end
+
     # def next_log
     #   @next_log ||= Log.unscoped.order(:id).where(:parent_id => self.parent_id).where('id > ?', self.id).first
     # end

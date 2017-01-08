@@ -13,7 +13,7 @@ module Admin
       @datatable = Effective::Datatables::Trash.new()
       @page_title = 'Trash'
 
-      EffectiveLogging.authorized?(self, :index, Effective::Log)
+      EffectiveLogging.authorized?(self, :restore, Effective::Log)
       EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
 
@@ -21,7 +21,7 @@ module Admin
       @trash = Effective::Log.trash.find(params[:id])
       @page_title = "Trash #{@trash.to_s}"
 
-      EffectiveLogging.authorized?(self, :show, @trash)
+      EffectiveLogging.authorized?(self, :restore, @trash)
       EffectiveLogging.authorized?(self, :admin, :effective_logging)
     end
   end

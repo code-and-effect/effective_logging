@@ -13,7 +13,7 @@ module EffectiveLoggingHelper
   end
 
   def render_log(log)
-    render(:partial => 'effective/logs/log', :locals => {:log => log})
+    render(partial: 'effective/logs/log', locals: {:log => log})
   end
   alias_method :render_trash, :render_log
 

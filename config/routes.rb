@@ -6,7 +6,9 @@ EffectiveLogging::Engine.routes.draw do
       member { get :html_part }
     end
 
-    resources :trash, only: [:index, :show]
+    resources :trash, only: [:index, :show] do
+      member { get :restore }
+    end
   end
 
   if defined?(EffectiveDatatables)
