@@ -117,7 +117,7 @@ module EffectiveLogging
 
     def log(message, status: EffectiveLogging.log_changes_status, details: {})
       logger.logged_changes.build(
-        user: EffectiveLogging.log_changes_user,
+        user: EffectiveLogging.current_user,
         status: status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details

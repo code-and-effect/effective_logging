@@ -213,7 +213,7 @@ And to your controller:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  before_action :set_log_changes_user
+  before_action :set_effective_logging_current_user
 end
 ```
 
@@ -272,7 +272,7 @@ And to your controller:
 
 ```ruby
 class ApplicationController < ActionController::Base
-  before_action :set_log_changes_user
+  before_action :set_effective_logging_current_user
 end
 ```
 

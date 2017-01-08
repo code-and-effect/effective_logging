@@ -15,6 +15,7 @@ module EffectiveLogging
   mattr_accessor :emails_enabled
   mattr_accessor :user_logins_enabled
   mattr_accessor :user_logouts_enabled
+  mattr_accessor :trash_enabled
 
   def self.setup
     yield self
@@ -47,13 +48,13 @@ module EffectiveLogging
     'trashed'.freeze
   end
 
-  # This is set by the "set_log_changes_user" before_filter.
-  def self.log_changes_user=(user)
-    @log_changes_user = user
+  # This is set by the "set_effective_logging_current_user" before_filter.
+  def self.current_user=(user)
+    @effective_logging_current_user = user
   end
 
-  def self.log_changes_user
-    @log_changes_user
+  def self.current_user
+    @effective_logging_current_user
   end
 
 end

@@ -31,9 +31,8 @@ EffectiveLogging.setup do |config|
 
   # config.layout = {
   #   logs: 'application',
-  #   admin_logs: 'admin',
-
   #   trash: 'application',
+  #   admin_logs: 'admin',
   #   admin_trash: 'admin'
   # }
 
@@ -51,4 +50,7 @@ EffectiveLogging.setup do |config|
   # Log all successful user login attempts
   config.user_logins_enabled = true
   config.user_logouts_enabled = false
+
+  # Enable the /trash, /admin/trash and /trash/:id/restore routes. Doesn't affect acts_as_trashable itself.
+  config.trash_enabled = true
 end
