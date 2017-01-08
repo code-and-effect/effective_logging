@@ -6,12 +6,15 @@ module EffectiveLogging
 
     def initialize(resource, options = {})
       raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
-      raise ArgumentError.new('logger must respond to logged_changes') unless (options[:logger] || resource).respond_to?(:logged_changes)
 
       @resource = resource
       @logger = options.delete(:logger) || resource
       @depth = options.delete(:depth) || 0
       @options = options
+
+      unless @logger.respond_to?(:logged_changes) || @logger.respond_to?(:trash)
+        raise ArgumentError.new('logger must respond to logged_changes or trash')
+      end
     end
 
     # execute! is called when we recurse, otherwise the following methods are best called individually
@@ -27,7 +30,7 @@ module EffectiveLogging
 
     # before_destroy
     def trashed!
-      log((resource.to_s rescue ''), status: EffectiveLogging.trashable_status, details: applicable(attributes))
+      log_trash((resource.to_s rescue ''), details: applicable(attributes))
     end
 
     # before_destroy
@@ -115,10 +118,19 @@ module EffectiveLogging
 
     private
 
-    def log(message, status: EffectiveLogging.log_changes_status, details: {})
+    def log(message, details: {})
       logger.logged_changes.build(
         user: EffectiveLogging.current_user,
-        status: status,
+        status: EffectiveLogging.log_changes_status,
+        message: "#{"\t" * depth}#{options[:prefix]}#{message}",
+        details: details
+      ).tap { |log| log.save }
+    end
+
+    def log_trash(message, details: {})
+      logger.build_trash(
+        user: EffectiveLogging.current_user,
+        status: EffectiveLogging.trashable_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details
       ).tap { |log| log.save }
