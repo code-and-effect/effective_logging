@@ -37,6 +37,7 @@ module EffectiveLogging
     initializer 'effective_logging.log_changes_action_controller' do |app|
       ActiveSupport.on_load :action_controller do
         ActionController::Base.include(EffectiveLogging::LogChangesUser)
+        ActionController::Base.send(:before_action, :set_effective_logging_current_user)
       end
     end
 

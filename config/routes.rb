@@ -6,7 +6,7 @@ EffectiveLogging::Engine.routes.draw do
       member { get :html_part }
     end
 
-    if EffectiveLogging.trash_enabled?
+    if EffectiveLogging.trash_enabled
       resources :trash, only: [:index, :show] do
         member { get :restore }
       end
@@ -17,7 +17,7 @@ EffectiveLogging::Engine.routes.draw do
     namespace :admin do
       resources :logs, :only => [:index, :show]
 
-      if EffectiveLogging.trash_enabled?
+      if EffectiveLogging.trash_enabled
         resources :trash, only: [:index, :show]
       end
     end

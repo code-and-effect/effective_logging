@@ -12,6 +12,10 @@ module EffectiveLogging
       end
     end
 
+    def set_log_changes_user
+      # No longer need to call this
+    end
+
   end
 end
 
