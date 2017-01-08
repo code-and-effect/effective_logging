@@ -32,11 +32,13 @@ module EffectiveLogging
       end
     end
 
-    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    # # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.log_changes_action_controller' do |app|
-      ActiveSupport.on_load :action_controller do
-        ActionController::Base.include(EffectiveLogging::SetCurrentUser)
-        ActionController::Base.send(:before_action, :set_effective_logging_current_user)
+      Rails.application.config.to_prepare do
+        ActiveSupport.on_load :action_controller do
+          require 'effective_logging/set_current_user'
+          ActionController::Base.include(EffectiveLogging::SetCurrentUser::ActionController)
+        end
       end
     end
 
