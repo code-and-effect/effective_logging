@@ -207,6 +207,14 @@ class Post < ActiveRecord::Base
 end
 ```
 
+and to your controller:
+
+```ruby
+class ApplicationController < ActionController::Base
+  before_action :set_effective_logging_current_user
+end
+```
+
 Then to see the log for this resource, on any view:
 
 ```erb

@@ -17,15 +17,6 @@ module EffectiveLogging
         # No longer need to call this
       end
 
-      # Sets the before action it immediately
-      def self.included(base)
-        if base.respond_to?(:before_action)
-          base.before_action :set_effective_logging_current_user
-        else
-          base.before_filter :set_effective_logging_current_user
-        end
-      end
-
     end
   end
 end
