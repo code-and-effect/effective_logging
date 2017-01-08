@@ -19,7 +19,7 @@ if defined?(EffectiveDatatables)
           table_column :message, label: 'Item'
 
           table_column :details, visible: true, sortable: false do |trash|
-            tableize_hash(trash.details, th: true, sub_th: false, width: '100%')
+            tableize_hash(trash.details.except(:trash), th: true, sub_th: false, width: '100%')
           end
 
           unless attributes[:actions] == false

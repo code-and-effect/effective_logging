@@ -84,6 +84,7 @@ module EffectiveLogging
 
       # Collect to_s representations for all has_one associations
       (resource.class.try(:reflect_on_all_associations, :has_one) || []).each do |association|
+        next if association.name == :trash && resource.respond_to?(:acts_as_trashable_options) # We skip our own association
         attributes[association.name] = resource.send(association.name).to_s.presence || 'nil'
       end
 

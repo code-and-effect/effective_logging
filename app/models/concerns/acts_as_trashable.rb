@@ -24,7 +24,7 @@ module ActsAsTrashable
     # Parse Options
     acts_as_trashable_options = {
       only: Array(@acts_as_trashable_options[:only]).map { |attribute| attribute.to_s },
-      except: Array(@acts_as_trashable_options[:except]) + ['trash'].map { |attribute| attribute.to_s },
+      except: Array(@acts_as_trashable_options[:except]).map { |attribute| attribute.to_s },
       additionally: Array(@acts_as_trashable_options[:additionally]).map { |attribute| attribute.to_s }
     }
 

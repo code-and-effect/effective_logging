@@ -16,6 +16,7 @@ Automatically logs any email sent by the application, any successful user login 
 
 Has an effective_datatables driven admin interface to display and search/sort/filter all logs.
 
+Audits changes and performs Trash restore functionality for Active Record objects.
 
 ## Getting Started
 
@@ -252,6 +253,44 @@ def log_changes_formatted_value(attribute, value)
     ActionController::Base.helpers.number_to_percentage(value)
   end
 end
+```
+
+### Trash & Restore
+
+This gem provides a fully functional Trash implementation that can be
+used to delete and restore active record objects in any rails application.
+
+Add to your model:
+
+```ruby
+class Post < ActiveRecord::Base
+  acts_as_trashable
+end
+```
+
+And to your controller:
+
+```ruby
+class ApplicationController < ActionController::Base
+  before_action :set_log_changes_user
+end
+```
+
+The `acts_as_trashable` mixin sets up `before_destroy` hook and copies the now-deleted attributes to an `Effective::Log` object.
+
+Visit `/trash`, or `/admin/trash` to restore them.
+
+The above routes require the following, user specific, permissions:
+
+```ruby
+can :restore, Effective::Log, user_id: user.id
+```
+
+and for admin:
+
+```ruby
+can :restore, Effective::Log
+can :admin, :effective_logging
 ```
 
 ### Logging From JavaScript

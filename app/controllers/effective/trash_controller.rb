@@ -17,7 +17,7 @@ module Effective
     # This is the User show event
     def show
       @trash = Effective::Log.trash.find(params[:id])
-      @page_title = "Trash #{@trash.to_s}"
+      @page_title = "Trash item - #{@trash.to_s}"
 
       EffectiveLogging.authorized?(self, :restore, @trash)
     end

@@ -8,6 +8,7 @@ module EffectiveLoggingHelper
       when 'info'     ; 'info'
       when 'warning'  ; 'warning'
       when 'error'    ; 'danger'
+      when 'trashed'  ; 'default'
       else 'primary'
     end
   end
