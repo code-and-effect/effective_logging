@@ -12,9 +12,7 @@ module EffectiveLogging
       @depth = options.delete(:depth) || 0
       @options = options
 
-      unless @logger.respond_to?(:logged_changes) || @logger.respond_to?(:trash)
-        raise ArgumentError.new('logger must respond to logged_changes or trash')
-      end
+      raise ArgumentError.new('logger must respond to logged_changes') unless @logger.respond_to?(:logged_changes)
     end
 
     # execute! is called when we recurse, otherwise the following methods are best called individually
@@ -26,11 +24,6 @@ module EffectiveLogging
       else
         changed!
       end
-    end
-
-    # before_destroy
-    def trashed!
-      log_trash((resource.to_s rescue ''), details: applicable(attributes))
     end
 
     # before_destroy
@@ -87,8 +80,7 @@ module EffectiveLogging
 
       # Collect to_s representations for all has_one associations
       (resource.class.try(:reflect_on_all_associations, :has_one) || []).each do |association|
-        next if association.name == :trash && resource.respond_to?(:acts_as_trashable_options) # We skip our own association
-        attributes[association.name] = resource.send(association.name).to_s.presence || 'nil'
+        attributes[association.name] = resource.send(association.name).to_s.presence
       end
 
       # Collects attributes for all accepts_as_nested_parameters has_many associations
@@ -122,15 +114,6 @@ module EffectiveLogging
       logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
-        message: "#{"\t" * depth}#{options[:prefix]}#{message}",
-        details: details
-      ).tap { |log| log.save }
-    end
-
-    def log_trash(message, details: {})
-      logger.build_trash(
-        user: EffectiveLogging.current_user,
-        status: EffectiveLogging.trashable_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         details: details
       ).tap { |log| log.save }

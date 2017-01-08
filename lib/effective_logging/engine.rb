@@ -29,14 +29,13 @@ module EffectiveLogging
     initializer 'effective_logging.active_record' do |app|
       ActiveSupport.on_load :active_record do
         ActiveRecord::Base.extend(ActsAsLoggable::ActiveRecord)
-        ActiveRecord::Base.extend(ActsAsTrashable::ActiveRecord)
       end
     end
 
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.log_changes_action_controller' do |app|
       ActiveSupport.on_load :action_controller do
-        ActionController::Base.include(EffectiveLogging::LogChangesUser)
+        ActionController::Base.include(EffectiveLogging::SetCurrentUser)
         ActionController::Base.send(:before_action, :set_effective_logging_current_user)
       end
     end

@@ -27,21 +27,15 @@ module Effective
     # end
 
     validates :message, presence: true
-    validates :status, presence: true, inclusion: { in: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status, EffectiveLogging.trashable_status]) }
+    validates :status, presence: true, inclusion: { in: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
 
     default_scope -> { order(updated_at: :desc) }
 
     scope :logged_changes, -> { where(status: EffectiveLogging.log_changes_status)}
     scope :changes, -> { where(status: EffectiveLogging.log_changes_status)}
-    scope :trash, -> { where(status: EffectiveLogging.trashable_status)}
 
     def to_s
-      case status
-      when EffectiveLogging.trashable_status
-        [associated_type, associated_id].join(' ').presence || 'New Trash item'
-      else
-        "Log #{id}"
-      end
+      "Log #{id}"
     end
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})
@@ -50,13 +44,6 @@ module Effective
 
     def details
       self[:details] || {}
-    end
-
-    # So this is a Trash item
-    # When we delete ourselves, we restore this trash item first
-    def restore_trashable!
-      raise 'no attributes to restore from' unless details.kind_of?(Hash) && details[:attributes].present?
-      associated_type.constantize.new(details[:attributes]).save!
     end
 
     # def next_log

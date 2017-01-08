@@ -5,21 +5,11 @@ EffectiveLogging::Engine.routes.draw do
     resources :logs, only: [:create, :index, :show] do
       member { get :html_part }
     end
-
-    if EffectiveLogging.trash_enabled
-      resources :trash, only: [:index, :show] do
-        member { get :restore }
-      end
-    end
   end
 
   if defined?(EffectiveDatatables)
     namespace :admin do
-      resources :logs, :only => [:index, :show]
-
-      if EffectiveLogging.trash_enabled
-        resources :trash, only: [:index, :show]
-      end
+      resources :logs, only: [:index, :show]
     end
   end
 

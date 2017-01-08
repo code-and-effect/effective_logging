@@ -1,5 +1,5 @@
 module EffectiveLogging
-  module LogChangesUser
+  module SetCurrentUser
 
     # Add me to your ApplicationController
     # before_action :set_effective_logging_current_user
