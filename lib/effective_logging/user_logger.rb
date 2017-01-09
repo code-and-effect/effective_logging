@@ -3,7 +3,7 @@ module EffectiveLogging
     def self.create_warden_hooks
       Warden::Manager.after_authentication do |user, warden, opts|
         if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
-          ::EffectiveLogger.success('user login',
+          ::EffectiveLogger.sign_in('Sign in',
             user: user,
             associated: user,
             ip: warden.request.ip.presence,
@@ -16,7 +16,7 @@ module EffectiveLogging
       Warden::Manager.after_set_user do |user, warden, opts|
         if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
           if (opts[:event] == :set_user rescue false) # User has just reset their password and signed in
-            ::EffectiveLogger.success('user login',
+            ::EffectiveLogger.sign_in('Sign in',
               user: user,
               associated: user,
               ip: warden.request.ip.presence,
@@ -42,12 +42,12 @@ module EffectiveLogging
             end
 
             if user.timedout?(last_request_at) && !warden.request.env['devise.skip_timeout']
-              ::EffectiveLogger.success('user logout', user: user, associated: user, timedout: true)
+              ::EffectiveLogger.sign_out('Sign out', user: user, associated: user, timedout: true)
             else
-              ::EffectiveLogger.success('user logout', user: user, associated: user)
+              ::EffectiveLogger.sign_out('Sign out', user: user, associated: user)
             end
           else # User does not respond to timedout
-            ::EffectiveLogger.success('user logout', user: user, associated: user)
+            ::EffectiveLogger.sign_out('Sign out', user: user, associated: user)
           end
         end
       end

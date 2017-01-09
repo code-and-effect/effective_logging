@@ -48,15 +48,15 @@ module EffectiveLogging
         user = (current_user rescue nil)
 
         if self.class.log_page_views_opts[:details] == false
-          ::EffectiveLogger.info("page view: #{request.request_method} #{request.path}", :user => user)
+          ::EffectiveLogger.view("#{request.request_method} #{request.path}", user: user)
         else
-          ::EffectiveLogger.info(
-            "page view: #{request.request_method} #{request.path}",
-            :user => user,
-            :params => request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
-            :format => (request.format.to_s == 'text/html' ? nil : request.format.to_s),
-            :referrer => request.referrer,
-            :user_agent => request.user_agent
+          ::EffectiveLogger.view(
+            "#{request.request_method} #{request.path}",
+            user: user,
+            params: request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
+            format: (request.format.to_s == 'text/html' ? nil : request.format.to_s),
+            referrer: request.referrer,
+            user_agent: request.user_agent
           )
         end
       end

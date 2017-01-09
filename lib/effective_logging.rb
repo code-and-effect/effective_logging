@@ -36,11 +36,15 @@ module EffectiveLogging
   end
 
   def self.statuses
-    @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
+    @statuses ||= (
+      Array(@@additional_statuses).map do |status|
+        status.to_s.downcase
+      end | ['info', 'success', 'error', log_changes_status, ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled), 'view'].compact
+    )
   end
 
   def self.log_changes_status
-    'logged change'.freeze
+    'change'.freeze
   end
 
   # This is set by the "set_effective_logging_current_user" before_filter.

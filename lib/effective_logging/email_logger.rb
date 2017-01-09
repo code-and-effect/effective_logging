@@ -24,7 +24,7 @@ module EffectiveLogging
         logged_fields[:to] = to
         logged_fields[:associated] ||= (User.where(email: to).first rescue nil)
 
-        ::EffectiveLogger.success("email sent: #{message.subject}", logged_fields)
+        ::EffectiveLogger.email("#{message.subject} - #{message.to.join(', ')}", logged_fields)
       end
     end
 
