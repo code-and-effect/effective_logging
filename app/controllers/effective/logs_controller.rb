@@ -8,7 +8,6 @@ module Effective
       before_filter :authenticate_user!, only: [:index, :show]
     end
 
-
     # This is a post from our Javascript
     def create
       EffectiveLogging.authorized?(self, :create, Effective::Log.new())

@@ -22,6 +22,11 @@ class EffectiveLogger
       log.user = options.delete(:user)
       log.parent = options.delete(:parent)
       log.associated = options.delete(:associated)
+      log.associated_to_s = options.delete(:associated_to_s)
+
+      if log.associated.present?
+        log.associated_to_s ||= (log.associated.to_s rescue nil)
+      end
 
       log.details = options.delete_if { |k, v| v.blank? } if options.kind_of?(Hash)
 

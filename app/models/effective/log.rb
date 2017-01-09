@@ -13,18 +13,21 @@ module Effective
 
     # The user this log item is referring to
     # An associated object, if we wanna add anything extra
-    belongs_to :user
-    belongs_to :associated, polymorphic: true
+    belongs_to :user, optional: true
+    belongs_to :associated, polymorphic: true, optional: true
 
     serialize :details, Hash
 
-    # structure do
-    #   logs_count          :integer  # Rails Counter Cache
-    #   message             :string, :validates => [:presence]
-    #   details             :text
-    #   status              :string, :validates => [:presence, :inclusion => {:in => EffectiveLogging.statuses }]
-    #   timestamps
-    # end
+    # Attributes
+    # logs_count          :integer  # Rails Counter Cache
+
+    # associated_type     :string
+    # associated_id       :integer
+    # associated_to_s     :string
+    # message             :string
+    # details             :text
+    # status              :string
+    # timestamps
 
     validates :message, presence: true
     validates :status, presence: true, inclusion: { in: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
@@ -39,7 +42,7 @@ module Effective
     end
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})
-      EffectiveLogger.log(message, status, (options || {}).merge({:parent => self}))
+      EffectiveLogger.log(message, status, (options || {}).merge(parent: self))
     end
 
     def details

@@ -42,10 +42,12 @@ EffectiveLogging.setup do |config|
   #### Automatic Logging Functionality ####
   #########################################
 
-  # Log all emails sent
+  # Log all sent emails
   config.email_enabled = true
 
-  # Log all successful user sign in / sign out
+  # Log all sign ins (successful only)
   config.sign_in_enabled = true
+
+  # Log all sign outs
   config.sign_out_enabled = false
 end

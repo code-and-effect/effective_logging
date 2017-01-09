@@ -2,10 +2,12 @@ class CreateEffectiveLogging < ActiveRecord::Migration
   def self.up
     create_table <%= @logs_table_name %> do |t|
       t.integer       :parent_id
+
       t.integer       :user_id
 
       t.string        :associated_type
       t.integer       :associated_id
+      t.string        :associated_to_s
 
       t.integer       :logs_count
 
@@ -21,6 +23,7 @@ class CreateEffectiveLogging < ActiveRecord::Migration
     add_index <%= @logs_table_name %>, :parent_id
     add_index <%= @logs_table_name %>, [:associated_type, :associated_id]
     add_index <%= @logs_table_name %>, :associated_id
+    add_index <%= @logs_table_name %>, :associated_to_s
   end
 
   def self.down

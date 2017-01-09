@@ -13,7 +13,7 @@ module EffectiveLoggingHelper
   end
 
   def render_log(log)
-    render(partial: 'effective/logs/log', locals: {:log => log})
+    render(partial: 'effective/logs/log', locals: {log: log})
   end
 
   def parents_of_log(log)
