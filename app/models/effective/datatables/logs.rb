@@ -24,7 +24,10 @@ if defined?(EffectiveDatatables)
 
           table_column :logs_count, visible: false
 
-          table_column :associated, filter: false, sortable: false, visible: false
+          table_column :associated_type, visible: false
+          table_column :associated_id, visible: false
+
+          table_column :associated_to_s, label: 'Associated'
 
           table_column :details, visible: false, sortable: false do |log|
             tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')
@@ -42,20 +45,17 @@ if defined?(EffectiveDatatables)
         def collection
           collection = Effective::Log.unscoped.where(parent_id: attributes[:log_id]).includes(:user, :associated)
 
-          if attributes[:user_id].present?
-            collection = collection.where(user_id: attributes[:user_id])
+          if attributes[:log_changes]
+            collection = collection.where(status: EffectiveLogging.log_changes_status)
           end
 
-          if attributes[:user].present?
-            collection = collection.where(user: attributes[:user])
+          if (attributes[:user] || attributes[:user_id]).present?
+            user_id = attributes[:user_id] || (attributes[:user].kind_of?(User) ? attributes[:user].id : attributes[:user].to_i)
+            collection = collection.where('user_id = ? OR (associated_id = ? AND associated_type = ?)', user_id, user_id, 'User')
           end
 
           if attributes[:associated_id] && attributes[:associated_type]
             collection = collection.where(associated_id: attributes[:associated_id], associated_type: attributes[:associated_type])
-          end
-
-          if attributes[:log_changes]
-            collection = collection.where(status: EffectiveLogging.log_changes_status)
           end
 
           if attributes[:associated]

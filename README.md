@@ -102,7 +102,7 @@ Any email sent by the application will be automatically logged.
 
 This behaviour can be disabled in the config/initializers/effective_logging.rb initializer.
 
-If the TO email address match a User, the :user will be set appropriately.
+If the TO email address match a User, the :associated will be set to this user.
 
 You can specify additional fields to be logged via your mailer:
 
@@ -111,7 +111,7 @@ def notify_admin_of_new_post(post)
   mail(
     to: 'admin@example.com',
     subject: 'A new post was created',
-    log: { :associated => post, :title => post.title }
+    log: { :post => post, :title => post.title }
   )
 end
 ```
