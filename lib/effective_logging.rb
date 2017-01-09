@@ -37,15 +37,15 @@ module EffectiveLogging
   end
 
   def self.statuses
-    @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error'])
+    @statuses ||= (Array(@@additional_statuses).map { |status| status.to_s.downcase } | ['info', 'success', 'error', 'change', 'trash', 'email'])
   end
 
   def self.log_changes_status
-    'logged change'.freeze
+    'change'.freeze
   end
 
   def self.trashable_status
-    'trashed'.freeze
+    'trash'.freeze
   end
 
   # This is set by the "set_effective_logging_current_user" before_filter.

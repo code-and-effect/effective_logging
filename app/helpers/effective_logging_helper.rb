@@ -4,11 +4,12 @@ module EffectiveLoggingHelper
 
   def bootstrap_class_for_status(status)
     case status
-      when 'success'  ; 'success'
-      when 'info'     ; 'info'
-      when 'warning'  ; 'warning'
-      when 'error'    ; 'danger'
-      when 'trashed'  ; 'default'
+      when 'success' ; 'success'
+      when 'info'    ; 'info'
+      when 'warning' ; 'warning'
+      when 'error'   ; 'danger'
+      when 'trash'   ; 'default'
+      when 'change'  ; 'info'
       else 'primary'
     end
   end
