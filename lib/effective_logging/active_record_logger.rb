@@ -53,11 +53,7 @@ module EffectiveLogging
           resource.log_changes_formatted_attribute(attribute)
         end || attribute.titleize
 
-        if after.present?
-          log("#{attribute} changed from #{before.presence || BLANK} to #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
-        else
-          log("#{attribute} set to #{before || BLANK}", details: { attribute: attribute, value: before })
-        end
+        log("#{attribute}: #{before.presence || BLANK} to #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
       end
 
       # Log changes on all accepts_as_nested_parameters has_many associations
@@ -103,7 +99,7 @@ module EffectiveLogging
       # Log to_s changes on all belongs_to associations
       (resource.class.try(:reflect_on_all_associations, :belongs_to) || []).each do |association|
         if (change = changes.delete(association.foreign_key)).present?
-          changes[association.name] = [association.klass.find_by_id(change.first), resource.send(association.name)]
+          changes[association.name] = [(association.klass.find_by_id(change.first) if changes.first), resource.send(association.name)]
         end
       end
 
