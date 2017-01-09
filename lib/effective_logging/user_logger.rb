@@ -4,10 +4,11 @@ module EffectiveLogging
       Warden::Manager.after_authentication do |user, warden, opts|
         if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
           ::EffectiveLogger.success('user login',
-            :user => user,
-            :ip => warden.request.ip.presence,
-            :referrer => warden.request.referrer,
-            :user_agent => warden.request.user_agent
+            user: user,
+            associated: user,
+            ip: warden.request.ip.presence,
+            referrer: warden.request.referrer,
+            user_agent: warden.request.user_agent
           )
         end
       end
@@ -16,11 +17,12 @@ module EffectiveLogging
         if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
           if (opts[:event] == :set_user rescue false) # User has just reset their password and signed in
             ::EffectiveLogger.success('user login',
-              :user => user,
-              :ip => warden.request.ip.presence,
-              :referrer => warden.request.referrer,
-              :user_agent => warden.request.user_agent,
-              :notes => 'after password reset'
+              user: user,
+              associated: user,
+              ip: warden.request.ip.presence,
+              referrer: warden.request.referrer,
+              user_agent: warden.request.user_agent,
+              notes: 'after password reset'
             )
           end
         end
@@ -40,12 +42,12 @@ module EffectiveLogging
             end
 
             if user.timedout?(last_request_at) && !warden.request.env['devise.skip_timeout']
-              ::EffectiveLogger.success('user logout', :user => user, :timedout => true)
+              ::EffectiveLogger.success('user logout', user: user, associated: user, timedout: true)
             else
-              ::EffectiveLogger.success('user logout', :user => user)
+              ::EffectiveLogger.success('user logout', user: user, associated: user)
             end
           else # User does not respond to timedout
-            ::EffectiveLogger.success('user logout', :user => user)
+            ::EffectiveLogger.success('user logout', user: user, associated: user)
           end
         end
       end

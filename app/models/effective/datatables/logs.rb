@@ -18,16 +18,15 @@ if defined?(EffectiveDatatables)
             table_column :status, filter: { type: :select, values: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
           end
 
+          table_column :associated_type, visible: false
+          table_column :associated_id, visible: false, label: 'Associated Id'
+          table_column :associated_to_s, label: 'Associated'
+
           table_column :message do |log|
             log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
           end
 
           table_column :logs_count, visible: false
-
-          table_column :associated_type, visible: false
-          table_column :associated_id, visible: false
-
-          table_column :associated_to_s, label: 'Associated'
 
           table_column :details, visible: false, sortable: false do |log|
             tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')

@@ -229,7 +229,7 @@ And on each create / destroy / update, a full dump of all current attributes is 
 
 There is some initial support for passing `only`, `except`, and `additionally` to the mixin to customize what attributes are saved.
 
-Define your model with `log_changes additionally: [:method1, :method2]` to also log the value of methods.
+Define your model with `log_changes additionally: [:method1, :method2]` to also _always_ log the value of that method. Even if it's unchanged.
 
 Apply your own formatting to the logged title of each attribute by creating an instance method on the resource:
 
@@ -328,7 +328,7 @@ render_datatable(@datatable)
 
 We can also use a similar method to create a datatable of logs for just one user.
 
-When initialized with :user_id, the 'User' column is hidden and the Logs are scoped to the User.
+When initialized with :user_id, the 'User' column is hidden and the Logs are scoped to any logs where this user is the User or Associated column.
 
 In your controller:
 

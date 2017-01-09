@@ -75,7 +75,7 @@ module EffectiveLogging
 
       # Collect to_s representations of all belongs_to associations
       (resource.class.try(:reflect_on_all_associations, :belongs_to) || []).each do |association|
-        attributes[association.name] = resource.send(association.name).to_s.presence || 'nil'
+        attributes[association.name] = resource.send(association.name).to_s.presence
       end
 
       # Collect to_s representations for all has_one associations
@@ -90,6 +90,8 @@ module EffectiveLogging
         Array(resource.send(association.name)).each_with_index do |child, index|
           attributes[association.name][index+1] = ActiveRecordLogger.new(child, options.merge(logger: logger)).attributes
         end
+
+        attributes[association.name].presence
       end
 
       attributes
@@ -115,6 +117,8 @@ module EffectiveLogging
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
+        associated: resource,
+        associated_to_s: (resource.to_s rescue nil),
         details: details
       ).tap { |log| log.save }
     end
