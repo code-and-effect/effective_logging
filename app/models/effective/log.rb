@@ -30,7 +30,7 @@ module Effective
     # timestamps
 
     validates :message, presence: true
-    validates :status, presence: true, inclusion: { in: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
+    validates :status, presence: true, inclusion: { in: EffectiveLogging.statuses }
 
     default_scope -> { order(updated_at: :desc) }
 

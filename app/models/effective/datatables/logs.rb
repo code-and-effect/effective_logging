@@ -15,7 +15,7 @@ if defined?(EffectiveDatatables)
           end
 
           unless attributes[:status] == false
-            table_column :status, filter: { type: :select, values: (EffectiveLogging.statuses + [EffectiveLogging.log_changes_status]) }
+            table_column :status, filter: { type: :select, values: EffectiveLogging.statuses }
           end
 
           table_column :associated_type, visible: false
