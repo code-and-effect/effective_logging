@@ -19,7 +19,7 @@ module EffectiveLogging
 
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
-      if EffectiveLogging.emails_enabled == true
+      if EffectiveLogging.email_enabled == true
         require 'effective_logging/email_logger'
         ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
       end
@@ -51,12 +51,12 @@ module EffectiveLogging
 
     # This has to be run after initialization or User hasn't been loaded yet
     config.after_initialize do
-      if EffectiveLogging.user_logins_enabled || EffectiveLogging.user_logouts_enabled
+      if EffectiveLogging.sign_in_enabled || EffectiveLogging.sign_out_enabled
         ActiveSupport.on_load :active_record do
           if defined?(Devise)
             EffectiveLogging::UserLogger.create_warden_hooks()
           else
-            raise ArgumentError.new("EffectiveLogging.user_logins_enabled only works with Devise")
+            raise ArgumentError.new("EffectiveLogging.sign_in_enabled only works with Devise")
           end
         end
       end

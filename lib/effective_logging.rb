@@ -12,9 +12,9 @@ module EffectiveLogging
   mattr_accessor :layout
   mattr_accessor :additional_statuses
 
-  mattr_accessor :emails_enabled
-  mattr_accessor :user_logins_enabled
-  mattr_accessor :user_logouts_enabled
+  mattr_accessor :email_enabled
+  mattr_accessor :sign_in_enabled
+  mattr_accessor :sign_out_enabled
 
   def self.setup
     yield self

@@ -2,7 +2,7 @@ module EffectiveLogging
   class UserLogger
     def self.create_warden_hooks
       Warden::Manager.after_authentication do |user, warden, opts|
-        if EffectiveLogging.user_logins_enabled && !EffectiveLogging.supressed?
+        if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
           ::EffectiveLogger.success('user login',
             :user => user,
             :ip => warden.request.ip.presence,
@@ -13,7 +13,7 @@ module EffectiveLogging
       end
 
       Warden::Manager.after_set_user do |user, warden, opts|
-        if EffectiveLogging.user_logins_enabled && !EffectiveLogging.supressed?
+        if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
           if (opts[:event] == :set_user rescue false) # User has just reset their password and signed in
             ::EffectiveLogger.success('user login',
               :user => user,
@@ -27,7 +27,7 @@ module EffectiveLogging
       end
 
       Warden::Manager.before_logout do |user, warden, opts|
-        if EffectiveLogging.user_logouts_enabled && !EffectiveLogging.supressed?
+        if EffectiveLogging.sign_out_enabled && !EffectiveLogging.supressed?
           if user.respond_to?(:timedout?) && user.respond_to?(:timeout_in)
             scope = opts[:scope]
             last_request_at = (warden.request.session["warden.#{scope}.#{scope}.session"]['last_request_at'] rescue Time.zone.now)
