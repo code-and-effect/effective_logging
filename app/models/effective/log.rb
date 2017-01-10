@@ -13,8 +13,13 @@ module Effective
 
     # The user this log item is referring to
     # An associated object, if we wanna add anything extra
-    belongs_to :user, optional: true
-    belongs_to :associated, polymorphic: true, optional: true
+    if Gem::Version.new(Rails.version) < Gem::Version.new('5.0')
+      belongs_to :user
+      belongs_to :associated, polymorphic: true
+    else
+      belongs_to :user, optional: true
+      belongs_to :associated, polymorphic: true, optional: true
+    end
 
     serialize :details, Hash
 
