@@ -10,7 +10,13 @@ if defined?(EffectiveDatatables)
           table_column :created_at
           table_column :id, visible: false
 
-          unless attributes[:user_id] || attributes[:user] || (attributes[:user] == false)
+          if attributes[:user] == false
+            # Do not include
+          elsif attributes[:user_id].present?
+            table_column :user, filter: { collection: User.where(id: Array(attributes[:user_id])) }
+          elsif attributes[:user].present?
+            table_column :user, filter: { collection: User.where(id: Array(attributes[:user]).map { |user| user.to_param }) }
+          else
             table_column :user
           end
 
@@ -49,8 +55,8 @@ if defined?(EffectiveDatatables)
           end
 
           if (attributes[:user] || attributes[:user_id]).present?
-            user_id = attributes[:user_id] || (attributes[:user].kind_of?(User) ? attributes[:user].id : attributes[:user].to_i)
-            collection = collection.where('user_id = ? OR (associated_id = ? AND associated_type = ?)', user_id, user_id, 'User')
+            user_ids = Array(attributes[:user].presence || attributes[:user_id]).map { |user| user.kind_of?(User) ? user.id : user.to_i }
+            collection = collection.where('user_id IN (?) OR (associated_id IN (?) AND associated_type = ?)', user_ids, user_ids, 'User')
           end
 
           if attributes[:associated_id] && attributes[:associated_type]
