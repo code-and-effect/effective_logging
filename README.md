@@ -261,6 +261,12 @@ First, require the javascript in your application.js:
 //= require effective_logging
 ```
 
+and add the user permission:
+
+```ruby
+can :create, Effective::Log
+```
+
 then logging an event from JavaScript is almost the same one-liner as from ruby:
 
 ```javascript

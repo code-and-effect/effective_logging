@@ -46,6 +46,10 @@ module Effective
       "Log #{id}"
     end
 
+    def message=(msg)
+      write_attribute(:message, msg.kind_of?(String) ? msg.to_s[0...255] : msg)
+    end
+
     def log(message, status = EffectiveLogging.statuses.first, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge(parent: self))
     end
