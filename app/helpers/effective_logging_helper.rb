@@ -27,21 +27,24 @@ module EffectiveLoggingHelper
   # Any other options are sent to the table tag
   def tableize_hash(hash, options = {})
     if hash.present? && hash.kind_of?(Hash)
-      content_tag(:table, options) do
-        hash.map do |k, v|
-          content_tag(:tr) do
-            content_tag((options[:th] ? :th : :td), k) +
-            content_tag(:td) do
-              if v.kind_of?(Hash)
-                tableize_hash(v, options.merge({:class => 'table table-bordered', :th => (options.key?(:sub_th) ? options[:sub_th] : options[:th])}))
-              elsif v.kind_of?(Array)
-                '[' + v.join(', ') + ']'
-              else
-                v.to_s
+      thing = content_tag(:table, class: options[:class]) do
+        content_tag(:thead) +
+        content_tag(:tbody) do
+          hash.map do |k, v|
+            content_tag(:tr) do
+              content_tag((options[:th] ? :th : :td), k) +
+              content_tag(:td) do
+                if v.kind_of?(Hash)
+                  tableize_hash(v, options.merge({class: 'table table-hover', th: (options.key?(:sub_th) ? options[:sub_th] : options[:th])}))
+                elsif v.kind_of?(Array)
+                  '[' + v.join(', ') + ']'
+                else
+                  v.to_s
+                end
               end
             end
-          end
-        end.join('').html_safe
+          end.join('').html_safe
+        end
       end.html_safe
     else
       hash.to_s.html_safe
@@ -65,7 +68,7 @@ module EffectiveLoggingHelper
     value = log.details[key]
 
     if value.kind_of?(Hash)
-      tableize_hash(value, :class => 'table', :th => true)
+      tableize_hash(value, class: 'table table-hover', th: true)
     elsif value.kind_of?(Array)
       value.map { |value| effective_logging_simple_format(value) }.join.html_safe
     else
