@@ -27,8 +27,7 @@ module EffectiveLoggingHelper
   # Any other options are sent to the table tag
   def tableize_hash(hash, options = {})
     if hash.present? && hash.kind_of?(Hash)
-      thing = content_tag(:table, class: options[:class]) do
-        content_tag(:thead) +
+      content_tag(:table, class: options[:class]) do
         content_tag(:tbody) do
           hash.map do |k, v|
             content_tag(:tr) do
