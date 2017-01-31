@@ -1,14 +1,16 @@
 module EffectiveLogging
   class ActiveRecordLogger
-    attr_accessor :resource, :logger, :depth, :options
+    attr_accessor :object, :resource, :logger, :depth, :options
 
     BLANK = "''"
 
-    def initialize(resource, options = {})
+    def initialize(object, options = {})
       raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
 
-      @resource = resource
-      @logger = options.delete(:logger) || resource
+      @object = object
+      @resource = Effective::Resource.new(object)
+
+      @logger = options.delete(:logger) || object
       @depth = options.delete(:depth) || 0
       @options = options
 
@@ -17,9 +19,9 @@ module EffectiveLogging
 
     # execute! is called when we recurse, otherwise the following methods are best called individually
     def execute!
-      if resource.new_record?
+      if object.new_record?
         created!
-      elsif resource.marked_for_destruction?
+      elsif object.marked_for_destruction?
         destroyed!
       else
         changed!
@@ -28,82 +30,42 @@ module EffectiveLogging
 
     # before_destroy
     def destroyed!
-      log('Deleted', details: applicable(attributes))
+      log('Deleted', details: applicable(resource.instance_attributes))
     end
 
     # after_commit
     def created!
-      log('Created', details: applicable(attributes))
+      log('Created', details: applicable(resource.instance_attributes))
     end
 
     # after_commit
     def updated!
-      log('Updated', details: applicable(attributes))
+      log('Updated', details: applicable(resource.instance_attributes))
     end
 
     # before_save
     def changed!
-      applicable(changes).each do |attribute, (before, after)|
-        if resource.respond_to?(:log_changes_formatted_value)
-          before = resource.log_changes_formatted_value(attribute, before) || before
-          after = resource.log_changes_formatted_value(attribute, after) || after
+      applicable(resource.instance_changes).each do |attribute, (before, after)|
+        if object.respond_to?(:log_changes_formatted_value)
+          before = object.log_changes_formatted_value(attribute, before) || before
+          after = object.log_changes_formatted_value(attribute, after) || after
         end
 
-        attribute = if resource.respond_to?(:log_changes_formatted_attribute)
-          resource.log_changes_formatted_attribute(attribute)
+        attribute = if object.respond_to?(:log_changes_formatted_attribute)
+          object.log_changes_formatted_attribute(attribute)
         end || attribute.titleize
 
-        log("#{attribute}: #{before.presence || BLANK} to #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
+        log("#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
       end
 
       # Log changes on all accepts_as_nested_parameters has_many associations
-      (resource.class.try(:reflect_on_all_autosave_associations) || []).each do |association|
-        child_name = association.name.to_s.singularize.titleize
+      resource.nested_resources.each do |association|
+        title = association.name.to_s.singularize.titleize
 
-        Array(resource.send(association.name)).each_with_index do |child, index|
-          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{child_name} ##{index+1}: ")).execute!
+        Array(object.send(association.name)).each_with_index do |child, index|
+          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{title} ##{index+1}: ")).execute!
         end
       end
-    end
-
-    def attributes
-      attributes = { attributes: resource.attributes }
-
-      # Collect to_s representations of all belongs_to associations
-      (resource.class.try(:reflect_on_all_associations, :belongs_to) || []).each do |association|
-        attributes[association.name] = resource.send(association.name).to_s.presence
-      end
-
-      # Collect to_s representations for all has_one associations
-      (resource.class.try(:reflect_on_all_associations, :has_one) || []).each do |association|
-        attributes[association.name] = resource.send(association.name).to_s.presence
-      end
-
-      # Collects attributes for all accepts_as_nested_parameters has_many associations
-      (resource.class.try(:reflect_on_all_autosave_associations) || []).each do |association|
-        attributes[association.name] = {}
-
-        Array(resource.send(association.name)).each_with_index do |child, index|
-          attributes[association.name][index+1] = ActiveRecordLogger.new(child, options.merge(logger: logger)).attributes
-        end
-
-        attributes[association.name].presence
-      end
-
-      attributes
-    end
-
-    def changes
-      changes = resource.changes
-
-      # Log to_s changes on all belongs_to associations
-      (resource.class.try(:reflect_on_all_associations, :belongs_to) || []).each do |association|
-        if (change = changes.delete(association.foreign_key)).present?
-          changes[association.name] = [(association.klass.find_by_id(change.first) if changes.first), resource.send(association.name)]
-        end
-      end
-
-      changes
     end
 
     private
@@ -113,8 +75,8 @@ module EffectiveLogging
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
-        associated: resource,
-        associated_to_s: (resource.to_s rescue nil),
+        associated: object,
+        associated_to_s: (object.to_s rescue nil),
         details: details
       ).tap { |log| log.save }
     end
@@ -130,7 +92,7 @@ module EffectiveLogging
       end
 
       (options[:additionally] || []).each do |attribute|
-        value = (resource.send(attribute) rescue :effective_logging_nope)
+        value = (object.send(attribute) rescue :effective_logging_nope)
         next if attributes[attribute].present? || value == :effective_logging_nope
 
         atts[attribute] = value
