@@ -18,8 +18,8 @@ module ActsAsLoggable
 
     around_save do |_, block|
       @acts_as_loggable_new_record = new_record?
-      block.call
       EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).changed! unless @acts_as_loggable_new_record
+      block.call
       true
     end
 
@@ -65,12 +65,7 @@ module ActsAsLoggable
   def log_changes_datatable
     if persisted?
       @log_changes_datatable ||= (
-        Effective::Datatables::Logs.new(
-          associated_id: id,
-          associated_type: self.class.name,
-          status: false,
-          log_changes: true
-        )
+        Effective::Datatables::Logs.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
       )
     end
   end
