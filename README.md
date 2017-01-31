@@ -246,9 +246,9 @@ Apply your own formatting to the logged before and after values of each attribut
 # Format the value of this attribute. Return nil to use the default to_s
 def log_changes_formatted_value(attribute, value)
   if ['cost'].include?(attribute)
-    ActionController::Base.helpers.number_to_currency(value)
+    ApplicationController.helpers.number_to_currency(value)
   elsif ['percentage'].include?(attribute)
-    ActionController::Base.helpers.number_to_percentage(value)
+    ApplicationController.helpers.number_to_percentage(value)
   end
 end
 ```
