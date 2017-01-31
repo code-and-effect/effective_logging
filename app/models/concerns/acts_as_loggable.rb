@@ -24,6 +24,7 @@ module ActsAsLoggable
     end
 
     before_destroy do
+      @acts_as_loggable_destroy_record = true
       EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
       true
     end
@@ -31,9 +32,10 @@ module ActsAsLoggable
     after_commit do
       if @acts_as_loggable_new_record
         EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
-      else
+      elsif !@acts_as_loggable_destroy_record
         EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
       end
+
       true
     end
 
