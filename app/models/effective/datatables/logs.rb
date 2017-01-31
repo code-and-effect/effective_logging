@@ -5,9 +5,9 @@ if defined?(EffectiveDatatables)
         include EffectiveLoggingHelper
 
         datatable do
-          default_order :created_at, :desc
+          default_order :updated_at, :desc
 
-          table_column :created_at
+          table_column :updated_at, label: 'Date'
           table_column :id, visible: false
 
           if attributes[:user] == false
@@ -24,9 +24,11 @@ if defined?(EffectiveDatatables)
             table_column :status, filter: { type: :select, values: EffectiveLogging.statuses }
           end
 
-          table_column :associated_type, visible: false
-          table_column :associated_id, visible: false, label: 'Associated Id'
-          table_column :associated_to_s, label: 'Associated'
+          unless attributes[:log_changes]
+            table_column :associated_type, visible: false
+            table_column :associated_id, visible: false, label: 'Associated Id'
+            table_column :associated_to_s, label: 'Associated'
+          end
 
           table_column :message do |log|
             log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
@@ -37,8 +39,6 @@ if defined?(EffectiveDatatables)
           table_column :details, visible: false, sortable: false do |log|
             tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')
           end
-
-          table_column :updated_at, visible: false
 
           unless attributes[:actions] == false
             actions_column partial: 'admin/logs/actions', partial_local: :log
