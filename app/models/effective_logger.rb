@@ -3,35 +3,34 @@
 class EffectiveLogger
   def self.log(message, status = EffectiveLogging.statuses.first, options = {})
     if options[:user].present? && !options[:user].kind_of?(User)
-      raise ArgumentError.new("Log.log :user => ... argument must be a User object")
+      raise ArgumentError.new('Log.log :user => ... argument must be a User object')
     end
 
     if options[:parent].present? && !options[:parent].kind_of?(Effective::Log)
-      raise ArgumentError.new("Log.log :parent => ... argument must be an Effective::Log object")
+      raise ArgumentError.new('Log.log :parent => ... argument must be an Effective::Log object')
     end
 
     if options[:associated].present? && !options[:associated].kind_of?(ActiveRecord::Base)
-      raise ArgumentError.new("Log.log :associated => ... argument must be an ActiveRecord::Base object")
+      raise ArgumentError.new('Log.log :associated => ... argument must be an ActiveRecord::Base object')
     end
 
-    Effective::Log.new().tap do |log|
-      log.message = message
-      log.status = status
+    log = Effective::Log.new(
+      message: message,
+      status: status,
+      user_id: options.delete(:user_id),
+      user: options.delete(:user),
+      parent: options.delete(:parent),
+      associated: options.delete(:associated),
+      associated_to_s: options.delete(:associated_to_s)
+    )
 
-      log.user_id = options.delete(:user_id)
-      log.user = options.delete(:user)
-      log.parent = options.delete(:parent)
-      log.associated = options.delete(:associated)
-      log.associated_to_s = options.delete(:associated_to_s)
-
-      if log.associated.present?
-        log.associated_to_s ||= (log.associated.to_s rescue nil)
-      end
-
-      log.details = options.delete_if { |k, v| v.blank? } if options.kind_of?(Hash)
-
-      log.save
+    if log.associated.present?
+      log.associated_to_s ||= (log.associated.to_s rescue nil)
     end
+
+    log.details = options.delete_if { |k, v| v.blank? } if options.kind_of?(Hash)
+
+    log.save
   end
 
   # Dynamically add logging methods based on the defined statuses
