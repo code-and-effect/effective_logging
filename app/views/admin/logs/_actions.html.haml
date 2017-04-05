@@ -1,8 +1,6 @@
 :ruby
   show_path =
-    if datatables_active_admin_path?
-      admin_effective_log_path(log)
-    elsif datatables_admin_path?
+    if datatable.try(:admin_namespace?)
       effective_logging.admin_log_path(log)
     else
       effective_logging.log_path(log)

@@ -1,18 +1,14 @@
 .panel{:class => "panel-#{bootstrap_class_for_status(log.status)}"}
   .panel-heading
-    - parents_of_log(log).each do |parent|
-      = link_to(log.message, (request.fullpath.gsub(log.to_param, parent.to_param) rescue '#'))
-      = ' > '
-    %strong= log.message
-    .pull-right
-      - if log.prev_log.present?
-        = link_to '< Prev', request.fullpath.gsub(log.to_param, log.prev_log.try(:to_param).to_s)
-
-      - if log.prev_log && log.next_log
-        = ' - '
-
-      - if log.next_log.present?
-        = link_to 'Next >', request.fullpath.gsub(log.to_param, log.next_log.try(:to_param).to_s)
+    .row
+      .col-sm-10
+        - parents_of_log(log).each do |parent|
+          = link_to(log.message, (request.fullpath.gsub(log.to_param, parent.to_param) rescue '#'))
+          = ' > '
+        %p= log.message
+      .col-sm-2.text-right
+        = link_to 'Prev', request.fullpath.gsub(log.to_param, log.prev_log.try(:to_param).to_s), class: 'btn btn-default', disabled: log.prev_log.blank?
+        = link_to 'Next', request.fullpath.gsub(log.to_param, log.next_log.try(:to_param).to_s), class: 'btn btn-default', disabled: log.next_log.blank?
 
   .panel-body
     .row

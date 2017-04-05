@@ -8,7 +8,12 @@ module Admin
     helper EffectiveLoggingHelper
 
     def index
-      @datatable = Effective::Datatables::Logs.new()
+      if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
+        @datatable = Effective::Datatables::Logs.new()
+      else
+        @datatable = EffectiveLogsDatatable.new(self)
+      end
+
       @page_title = 'Logs'
 
       EffectiveLogging.authorized?(self, :index, Effective::Log)
@@ -23,7 +28,11 @@ module Admin
       @page_title = "Log ##{@log.to_param}"
 
       if @log.logs.present?
-        @log.datatable = Effective::Datatables::Logs.new(log_id: @log.id) if defined?(EffectiveDatatables)
+        if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
+          @log.datatable = Effective::Datatables::Logs.new(log_id: @log.id)
+        else
+          @log.datatable = EffectiveLogsDatatable.new(self, log_id: @log.id)
+        end
       end
 
       EffectiveLogging.authorized?(self, :show, @log)

@@ -39,8 +39,11 @@ module Effective
 
     # This is the User index event
     def index
-      @datatable = Effective::Datatables::Logs.new(user_id: current_user.id)
-      @page_title = 'My Activity'
+      if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
+        @datatable = Effective::Datatables::Logs.new(user_id: current_user.id)
+      else
+        @datatable = EffectiveLogsDatatable.new(self, user_id: current_user.id)
+      end
 
       EffectiveLogging.authorized?(self, :index, Effective::Log.new(user_id: current_user.id))
     end
@@ -54,7 +57,11 @@ module Effective
       @page_title = "Log ##{@log.to_param}"
 
       if @log.logs.present?
-        @log.datatable = Effective::Datatables::Logs.new(log_id: @log.id) if defined?(EffectiveDatatables)
+        if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
+          @log.datatable = Effective::Datatables::Logs.new(log_id: @log.id)
+        else
+          @log.datatable = EffectiveLogsDatatable.new(self, log_id: @log.id)
+        end
       end
 
       EffectiveLogging.authorized?(self, :show, @log)
