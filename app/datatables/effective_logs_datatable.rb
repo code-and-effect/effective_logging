@@ -21,9 +21,10 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
       end
 
       unless attributes[:log_changes]
-        col :associated_type, search: { as: :string }, visible: false
-        col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
-        col :associated_to_s, search: { as: :string }, label: 'Associated'
+        col :associated
+        #col :associated_type, search: { as: :string }, visible: false
+        #col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
+        #col :associated_to_s, search: { as: :string }, label: 'Associated'
       end
 
       col :message do |log|
