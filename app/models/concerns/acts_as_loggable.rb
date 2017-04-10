@@ -18,7 +18,11 @@ module ActsAsLoggable
 
     around_save do |_, block|
       @acts_as_loggable_new_record = new_record?
-      EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).changed! unless @acts_as_loggable_new_record
+
+      unless @acts_as_loggable_new_record
+        @acts_as_loggable_update_record = EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).changed!
+      end
+
       block.call
       true
     end
@@ -32,7 +36,7 @@ module ActsAsLoggable
     after_commit do
       if @acts_as_loggable_new_record
         EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
-      elsif !@acts_as_loggable_destroy_record
+      elsif !@acts_as_loggable_destroy_record && @acts_as_loggable_update_record
         EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
       end
 

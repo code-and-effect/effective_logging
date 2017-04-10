@@ -51,6 +51,9 @@ module EffectiveLogging
           after = object.log_changes_formatted_value(attribute, after) || after
         end
 
+        before = before.to_s if before.kind_of?(ActiveRecord::Base)
+        after = after.to_s if after.kind_of?(ActiveRecord::Base)
+
         attribute = if object.respond_to?(:log_changes_formatted_attribute)
           object.log_changes_formatted_attribute(attribute)
         end || attribute.titleize
@@ -66,18 +69,25 @@ module EffectiveLogging
           ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{title} ##{index+1}: ")).execute!
         end
       end
+
+      @logged == true
     end
 
     private
 
     def log(message, details: {})
-      logger.logged_changes.build(
+      @logged = true
+
+      log = logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         associated_to_s: (logger.to_s rescue nil),
         details: details
-      ).tap { |log| log.save }
+      )
+
+      log.save
+      log
     end
 
     # TODO: Make this work better with nested objects
