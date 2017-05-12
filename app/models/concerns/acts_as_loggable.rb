@@ -6,7 +6,7 @@ module ActsAsLoggable
       @acts_as_loggable_options = options.try(:first) || {}
 
       unless @acts_as_loggable_options.kind_of?(Hash)
-        raise ArgumentError.new("invalid arguments passed to (effective_logging) log_changes. Example usage: log_changes except: [:created_at]")
+        raise ArgumentError.new('invalid arguments passed to (effective_logging) log_changes. Example usage: log_changes except: [:created_at]')
       end
 
       include ::ActsAsLoggable
@@ -69,11 +69,15 @@ module ActsAsLoggable
   end
 
   def log_changes_datatable
-    if persisted?
-      @log_changes_datatable ||= (
+    return nil unless persisted?
+
+    @log_changes_datatable ||= (
+      if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
         Effective::Datatables::Logs.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
-      )
-    end
+      else
+        EffectiveLogsDatatable.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
+      end
+    )
   end
 
 end

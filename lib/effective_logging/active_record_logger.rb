@@ -46,6 +46,8 @@ module EffectiveLogging
     # before_save
     def changed!
       applicable(resource.instance_changes).each do |attribute, (before, after)|
+        next if before == nil && after == ''.freeze
+
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
@@ -66,7 +68,7 @@ module EffectiveLogging
         title = association.name.to_s.singularize.titleize
 
         Array(object.send(association.name)).each_with_index do |child, index|
-          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{title} ##{index+1}: ")).execute!
+          ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{title} #{index} - #{child} - ")).execute!
         end
       end
 
