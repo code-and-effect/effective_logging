@@ -30,8 +30,12 @@ if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
             table_column :associated_to_s, label: 'Associated'
           end
 
-          table_column :message do |log|
-            log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
+          if attributes[:log_changes]
+            table_column :message do |log|
+              log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
+            end
+          else
+            table_column :message
           end
 
           table_column :logs_count, visible: false

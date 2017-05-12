@@ -13,7 +13,7 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
       elsif attributes[:user].present?
         col :user, search: { collection: User.where(id: Array(attributes[:user]).map { |user| user.to_param }) }
       else
-        col :user, search: { as: :string }
+        col :user
       end
 
       unless attributes[:status] == false
@@ -21,14 +21,17 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
       end
 
       unless attributes[:log_changes]
-        col :associated
-        #col :associated_type, search: { as: :string }, visible: false
-        #col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
-        #col :associated_to_s, search: { as: :string }, label: 'Associated'
+        col :associated_type, search: { as: :string }, visible: false
+        col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
+        col :associated_to_s, search: { as: :string }, label: 'Associated'
       end
 
-      col :message do |log|
-        log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
+      if attributes[:log_changes]
+        col :message do |log|
+          log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
+        end
+      else
+        col :message
       end
 
       col :logs_count, visible: false
@@ -37,7 +40,9 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
         tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')
       end
 
-      actions_col partial: 'admin/logs/actions', partial_as: :log
+      unless attributes[:actions] == false
+        actions_col partial: 'admin/logs/actions', partial_as: :log
+      end
     end
 
     # A nil attributes[:log_id] means give me all the top level log entries
