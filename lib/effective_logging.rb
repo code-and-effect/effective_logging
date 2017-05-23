@@ -1,4 +1,3 @@
-require 'haml-rails'
 require 'effective_resources'
 require 'effective_logging/engine'
 require 'effective_logging/version'

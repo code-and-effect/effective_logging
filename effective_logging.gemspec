@@ -21,6 +21,4 @@ Gem::Specification.new do |s|
   s.add_dependency 'effective_resources'
   s.add_dependency 'coffee-rails'
   s.add_dependency 'devise'
-  s.add_dependency 'haml-rails'
-
 end
