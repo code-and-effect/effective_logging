@@ -30,17 +30,17 @@ module EffectiveLogging
 
     # before_destroy
     def destroyed!
-      log('Deleted', details: applicable(resource.instance_attributes))
+      log('Deleted', details: applicable(resource.instance_attributes)); true
     end
 
     # after_commit
     def created!
-      log('Created', details: applicable(resource.instance_attributes))
+      log('Created', details: applicable(resource.instance_attributes)); true
     end
 
     # after_commit
     def updated!
-      log('Updated', details: applicable(resource.instance_attributes))
+      log('Updated', details: applicable(resource.instance_attributes)); true
     end
 
     # before_save
@@ -68,7 +68,7 @@ module EffectiveLogging
         title = association.name.to_s.singularize.titleize
 
         Array(object.send(association.name)).each_with_index do |child, index|
-          @logged ||= ActiveRecordLogger.new(child, options.merge(logger: logger, depth: (depth + 1), prefix: "#{title} #{index} - #{child} - ")).execute!
+          @logged ||= ActiveRecordLogger.new(child, options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ")).execute!
         end
       end
 
