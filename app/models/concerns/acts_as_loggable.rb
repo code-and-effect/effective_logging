@@ -20,7 +20,7 @@ module ActsAsLoggable
       @acts_as_loggable_new_record = new_record?
 
       unless @acts_as_loggable_new_record
-        @acts_as_loggable_update_record = EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).changed!
+        @acts_as_loggable_update_record = EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
       end
 
       block.call

@@ -9,6 +9,7 @@ module EffectiveLogging
 
       @object = object
       @resource = Effective::Resource.new(object)
+      @logged = false # If work was done
 
       @logger = options.delete(:logger) || object
       @depth = options.delete(:depth) || 0
@@ -26,24 +27,28 @@ module EffectiveLogging
       else
         changed!
       end
+      log_nested_resources!
+
+      @logged
     end
 
     # before_destroy
     def destroyed!
-      log('Deleted', details: applicable(resource.instance_attributes)); true
+      log('Deleted', details: applicable(resource.instance_attributes))
     end
 
     # after_commit
     def created!
-      log('Created', details: applicable(resource.instance_attributes)); true
+      log('Created', details: applicable(resource.instance_attributes))
     end
 
     # after_commit
     def updated!
-      log('Updated', details: applicable(resource.instance_attributes)); true
+      log('Updated', details: applicable(resource.instance_attributes))
     end
 
-    # before_save
+    private
+
     def changed!
       applicable(resource.instance_changes).each do |attribute, (before, after)|
         next if before == nil && after == ''.freeze
@@ -62,20 +67,18 @@ module EffectiveLogging
 
         log("#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
       end
+    end
 
+    def log_nested_resources!
       # Log changes on all accepts_as_nested_parameters has_many associations
       resource.nested_resources.each do |association|
         title = association.name.to_s.singularize.titleize
 
         Array(object.send(association.name)).each_with_index do |child, index|
-          @logged ||= ActiveRecordLogger.new(child, options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ")).execute!
+          @logged = true if ActiveRecordLogger.new(child, options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ")).execute!
         end
       end
-
-      @logged == true
     end
-
-    private
 
     def log(message, details: {})
       @logged = true
