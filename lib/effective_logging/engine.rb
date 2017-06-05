@@ -1,3 +1,5 @@
+require 'effective_logging/active_record_logger'
+
 module EffectiveLogging
   class Engine < ::Rails::Engine
     engine_name 'effective_logging'

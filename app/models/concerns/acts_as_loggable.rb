@@ -20,7 +20,7 @@ module ActsAsLoggable
       @acts_as_loggable_new_record = new_record?
 
       unless @acts_as_loggable_new_record
-        @acts_as_loggable_update_record = ::ActiveRecordLogger.new(self, log_changes_options).execute!
+        @acts_as_loggable_update_record = ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
       end
 
       block.call
@@ -29,15 +29,15 @@ module ActsAsLoggable
 
     before_destroy do
       @acts_as_loggable_destroy_record = true
-      ::ActiveRecordLogger.new(self, log_changes_options).destroyed!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
       true
     end
 
     after_commit do
       if @acts_as_loggable_new_record
-        ::ActiveRecordLogger.new(self, log_changes_options).created!
+        ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
       elsif !@acts_as_loggable_destroy_record && @acts_as_loggable_update_record
-        ::ActiveRecordLogger.new(self, log_changes_options).updated!
+        ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
       end
 
       true
