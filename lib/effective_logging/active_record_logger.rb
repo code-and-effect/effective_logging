@@ -75,7 +75,7 @@ module EffectiveLogging
         title = association.name.to_s.singularize.titleize
 
         Array(object.send(association.name)).each_with_index do |child, index|
-          @logged = true if ::EffectiveLogging::ActiveRecordLogger.new(child, options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ")).execute!
+          @logged = true if ::ActiveRecordLogger.new(child, options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ")).execute!
         end
       end
     end
