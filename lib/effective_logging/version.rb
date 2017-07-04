@@ -1,3 +1,3 @@
 module EffectiveLogging
-  VERSION = '1.10.15'.freeze
+  VERSION = '1.10.16'.freeze
 end
