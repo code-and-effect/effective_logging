@@ -17,9 +17,6 @@ module Effective
         log.status = (EffectiveLogging.statuses.include?(log_params[:status]) ? log_params[:status] : 'info')
         log.user = (current_user rescue nil)
 
-        #log.parent = options.delete(:parent)
-        #log.associated = options.delete(:associated)
-
         count = -1
         Array((JSON.parse(log_params[:details]) rescue [])).flatten(1).each do |obj|
           if obj.kind_of?(Hash)
@@ -29,12 +26,15 @@ module Effective
           end
         end
 
-        log.details[:referrer] = request.referrer
+        # Match the referrer
+        log.details[:ip] ||= request.ip
+        log.details[:referrer] ||= request.referrer
+        log.details[:user_agent] ||= request.user_agent
 
         log.save
       end
 
-      render :text => "ok", :status => :ok
+      render text: 'ok', status: :ok
     end
 
     # This is the User index event

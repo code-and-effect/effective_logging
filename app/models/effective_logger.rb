@@ -28,9 +28,7 @@ class EffectiveLogger
       log.associated_to_s ||= (log.associated.to_s rescue nil)
     end
 
-    binding.pry
-
-    if options[:request].present? && options[:request].respond_to?(:user_agent)
+    if options[:request].present? && options[:request].respond_to?(:referrer)
       request = options.delete(:request)
 
       options[:ip] ||= request.ip

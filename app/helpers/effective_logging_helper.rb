@@ -42,7 +42,7 @@ module EffectiveLoggingHelper
 
     open = value.index('<!DOCTYPE html') || value.index('<html')
     close = value.rindex('</html>') if open.present?
-    return format_resource_value(value) unless (open.present? && close.present?)
+    return format_log_details_resource_value(value) unless (open.present? && close.present?)
 
     before = value[0...open]
     after = value[(close+7)..-1]
@@ -58,6 +58,13 @@ module EffectiveLoggingHelper
         scrolling: 'no'),
       h(after).gsub("\n", '<br>')
     ].compact.join.html_safe
+  end
+
+  def format_log_details_resource_value(value)
+    @format_resource_tags ||= ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']
+    @format_resource_atts ||= ActionView::Base.sanitized_allowed_attributes.to_a + ['colspan', 'rowspan']
+
+    simple_format(sanitize(value.to_s, tags: @format_resource_tags, attributes: @format_resource_atts), {}, sanitize: false)
   end
 
 end
