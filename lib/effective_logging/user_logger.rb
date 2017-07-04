@@ -6,9 +6,7 @@ module EffectiveLogging
           ::EffectiveLogger.sign_in('Sign in',
             user: user,
             associated: user,
-            ip: warden.request.ip.presence,
-            referrer: warden.request.referrer,
-            user_agent: warden.request.user_agent
+            request: warden.request
           )
         end
       end
@@ -19,9 +17,7 @@ module EffectiveLogging
             ::EffectiveLogger.sign_in('Sign in',
               user: user,
               associated: user,
-              ip: warden.request.ip.presence,
-              referrer: warden.request.referrer,
-              user_agent: warden.request.user_agent,
+              request: warden.request,
               notes: 'after password reset'
             )
           end

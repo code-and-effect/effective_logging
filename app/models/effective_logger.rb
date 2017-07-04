@@ -28,6 +28,16 @@ class EffectiveLogger
       log.associated_to_s ||= (log.associated.to_s rescue nil)
     end
 
+    binding.pry
+
+    if options[:request].present? && options[:request].respond_to?(:user_agent)
+      request = options.delete(:request)
+
+      options[:ip] ||= request.ip
+      options[:referrer] ||= request.referrer
+      options[:user_agent] ||= request.user_agent
+    end
+
     log.details = options.delete_if { |k, v| v.blank? } if options.kind_of?(Hash)
 
     log.save

@@ -53,10 +53,9 @@ module EffectiveLogging
           ::EffectiveLogger.view(
             "#{request.request_method} #{request.path}",
             user: user,
-            params: request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
             format: (request.format.to_s == 'text/html' ? nil : request.format.to_s),
-            referrer: request.referrer,
-            user_agent: request.user_agent
+            params: request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
+            request: request
           )
         end
       end
