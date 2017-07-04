@@ -41,7 +41,7 @@ if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
           table_column :logs_count, visible: false
 
           table_column :details, visible: false, sortable: false do |log|
-            tableize_hash(log.details.except(:email), th: true, sub_th: false, width: '100%')
+            tableize_hash(log.details.except(:email), th: true, sub_th: false)
           end
 
           unless attributes[:actions] == false

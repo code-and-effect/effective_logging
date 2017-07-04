@@ -14,7 +14,7 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: Effective::Log
+    has_many :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
 
     around_save do |_, block|
       @acts_as_loggable_new_record = new_record?
