@@ -321,7 +321,7 @@ If you don't want to use the builtin Admin screen, and would rather render the e
 In your controller:
 
 ```ruby
-@datatable = Effective::Datatables::Logs.new()
+@datatable = EffectiveLogsDatatable.new(self)
 ```
 
 And then in your view:
@@ -340,7 +340,7 @@ In your controller:
 
 ```ruby
 @user = User.find(params[:id])
-@datatable = Effective::Datatables::Logs.new(:user_id => @user.id)
+@datatable = EffectiveLogsDatatable.new(self, user_id: @user.id)
 ```
 
 

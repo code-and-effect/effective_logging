@@ -34,7 +34,7 @@ module Effective
         log.save
       end
 
-      render text: 'ok', status: :ok
+      render text: 'ok', status: :ok, json: {}
     end
 
     # This is the User index event
