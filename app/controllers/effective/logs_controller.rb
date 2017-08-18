@@ -78,9 +78,9 @@ module Effective
       close = value.rindex('</html>') if open.present?
 
       if open.present? && close.present?
-        render text: value[open...(close+7)]
+        render inline: value[open...(close+7)].html_safe
       else
-        render text: value
+        render inline: value.html_safe
       end
     end
 
