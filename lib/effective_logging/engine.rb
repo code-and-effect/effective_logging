@@ -34,7 +34,7 @@ module EffectiveLogging
       end
     end
 
-    # # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.log_changes_action_controller' do |app|
       Rails.application.config.to_prepare do
         ActiveSupport.on_load :action_controller do

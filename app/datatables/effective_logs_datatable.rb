@@ -8,10 +8,8 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
 
       if attributes[:user] == false
         # Do not include
-      elsif attributes[:user_id].present?
-        col :user, search: { collection: User.where(id: Array(attributes[:user_id])) }
-      elsif attributes[:user].present?
-        col :user, search: { collection: User.where(id: Array(attributes[:user]).map { |user| user.to_param }) }
+      elsif attributes[:for]
+        col :user, search: :string
       else
         col :user
       end
@@ -54,8 +52,8 @@ unless Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
         scope = scope.where(status: EffectiveLogging.log_changes_status)
       end
 
-      if (attributes[:user] || attributes[:user_id]).present?
-        user_ids = Array(attributes[:user].presence || attributes[:user_id]).map { |user| user.kind_of?(User) ? user.id : user.to_i }
+      if attributes[:for]
+        user_ids = Array(attributes[:for])
         scope = scope.where('user_id IN (?) OR (associated_id IN (?) AND associated_type = ?)', user_ids, user_ids, 'User')
       end
 

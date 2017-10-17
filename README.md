@@ -321,7 +321,7 @@ If you don't want to use the builtin Admin screen, and would rather render the e
 In your controller:
 
 ```ruby
-@datatable = EffectiveLogsDatatable.new(self)
+@datatable = EffectiveLogsDatatable.new
 ```
 
 And then in your view:
@@ -334,13 +334,11 @@ render_datatable(@datatable)
 
 We can also use a similar method to create a datatable of logs for just one user.
 
-When initialized with :user_id, the 'User' column is hidden and the Logs are scoped to any logs where this user is the User or Associated column.
-
-In your controller:
+When initialized with :for, the logs are scoped to any log where this id matches the User or Associated column.
 
 ```ruby
-@user = User.find(params[:id])
-@datatable = EffectiveLogsDatatable.new(self, user_id: @user.id)
+EffectiveLogsDatatable.new(for: @user.id)
+EffectiveLogsDatatable.new(for: [1, 2, 3])  # Users with ID 1, 2 and 3
 ```
 
 
