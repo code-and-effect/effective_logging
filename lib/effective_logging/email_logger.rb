@@ -21,8 +21,11 @@ module EffectiveLogging
       logged_fields[:email] = "#{message.header}<hr>#{(body.presence || message.body)}"
 
       (message.to || []).each do |to|
+        user = (User.where(email: to).first rescue nil)
+
         logged_fields[:to] = to
-        logged_fields[:associated] ||= (User.where(email: to).first rescue nil)
+        logged_fields[:associated] ||= user
+        logged_fields[:user] ||= user
 
         ::EffectiveLogger.email("#{message.subject} - #{message.to.join(', ')}", logged_fields)
       end
