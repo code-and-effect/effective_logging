@@ -51,15 +51,13 @@ module EffectiveLogging
 
     def changed!
       applicable(resource.instance_changes).each do |attribute, (before, after)|
-        next if before == nil && after == ''.freeze
-
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
         end
 
-        before = before.to_s if before.kind_of?(ActiveRecord::Base)
-        after = after.to_s if after.kind_of?(ActiveRecord::Base)
+        before = before.to_s if before.kind_of?(ActiveRecord::Base) || (before == false)
+        after = after.to_s if after.kind_of?(ActiveRecord::Base) || (after == false)
 
         attribute = if object.respond_to?(:log_changes_formatted_attribute)
           object.log_changes_formatted_attribute(attribute)
