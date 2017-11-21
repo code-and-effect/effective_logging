@@ -56,8 +56,8 @@ module EffectiveLogging
           after = object.log_changes_formatted_value(attribute, after) || after
         end
 
-        before = before.to_s if before.kind_of?(ActiveRecord::Base) || (before == false)
-        after = after.to_s if after.kind_of?(ActiveRecord::Base) || (after == false)
+        before = before.to_s if before.kind_of?(ActiveRecord::Base) || before.kind_of?(FalseClass)
+        after = after.to_s if after.kind_of?(ActiveRecord::Base) || after.kind_of?(FalseClass)
 
         attribute = if object.respond_to?(:log_changes_formatted_attribute)
           object.log_changes_formatted_attribute(attribute)
