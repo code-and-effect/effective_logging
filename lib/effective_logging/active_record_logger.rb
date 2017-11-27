@@ -110,6 +110,9 @@ module EffectiveLogging
         atts[attribute] = value
       end
 
+      # Blacklist
+      [:logged_changes, :trash].each { |nope| atts.delete(nope) }
+
       atts
     end
 
