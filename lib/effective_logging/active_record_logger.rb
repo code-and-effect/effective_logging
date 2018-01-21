@@ -95,12 +95,13 @@ module EffectiveLogging
 
     # TODO: Make this work better with nested objects
     def applicable(attributes)
+
       atts = if options[:only].present?
-        attributes.slice(*options[:only])
+        attributes.stringify_keys.slice(*options[:only])
       elsif options[:except].present?
-        attributes.except(*options[:except])
+        attributes.stringify_keys.except(*options[:except])
       else
-        attributes.except(:updated_at, :created_at)
+        attributes.except(:updated_at, :created_at, 'updated_at', 'created_at')
       end
 
       (options[:additionally] || []).each do |attribute|
@@ -111,9 +112,7 @@ module EffectiveLogging
       end
 
       # Blacklist
-      [:logged_changes, :trash].each { |nope| atts.delete(nope) }
-
-      atts
+      atts.except(:logged_changes, :trash, 'logged_changes', 'trash')
     end
 
   end
