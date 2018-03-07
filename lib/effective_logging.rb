@@ -6,7 +6,6 @@ module EffectiveLogging
 
   # The following are all valid config keys
   mattr_accessor :logs_table_name
-  mattr_accessor :use_active_admin
 
   mattr_accessor :authorization_method
   mattr_accessor :layout
@@ -21,10 +20,20 @@ module EffectiveLogging
   end
 
   def self.authorized?(controller, action, resource)
-    if authorization_method.respond_to?(:call) || authorization_method.kind_of?(Symbol)
-      raise Effective::AccessDenied.new() unless (controller || self).instance_exec(controller, action, resource, &authorization_method)
+    @_exceptions ||= [Effective::AccessDenied, (CanCan::AccessDenied if defined?(CanCan)), (Pundit::NotAuthorizedError if defined?(Pundit))].compact
+
+    return !!authorization_method unless authorization_method.respond_to?(:call)
+    controller = controller.controller if controller.respond_to?(:controller)
+
+    begin
+      !!(controller || self).instance_exec((controller || self), action, resource, &authorization_method)
+    rescue *@_exceptions
+      false
     end
-    true
+  end
+
+  def self.authorize!(controller, action, resource)
+    raise Effective::AccessDenied unless authorized?(controller, action, resource)
   end
 
   def self.supressed(&block)
@@ -38,7 +47,7 @@ module EffectiveLogging
   def self.statuses
     @statuses ||= (
       Array(@@additional_statuses).map { |status| status.to_s.downcase } |  # union
-      ['info', 'success', 'error', 'view', 'change', ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled)].compact
+      ['info', 'success', 'error', 'view', log_changes_status, ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled)].compact
     )
   end
 

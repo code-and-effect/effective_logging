@@ -7,10 +7,8 @@ EffectiveLogging::Engine.routes.draw do
     end
   end
 
-  if defined?(EffectiveDatatables)
-    namespace :admin do
-      resources :logs, only: [:index, :show]
-    end
+  namespace :admin do
+    resources :logs, only: [:index, :show]
   end
 
 end

@@ -11,14 +11,6 @@ module EffectiveLogging
       eval File.read("#{config.root}/config/effective_logging.rb")
     end
 
-    # ActiveAdmin (optional)
-    # This prepends the load path so someone can override the assets.rb if they want.
-    initializer 'effective_logging.active_admin' do
-      if defined?(ActiveAdmin) && EffectiveLogging.use_active_admin == true
-        ActiveAdmin.application.load_paths.unshift Dir["#{config.root}/active_admin"]
-      end
-    end
-
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.email_enabled == true
@@ -55,11 +47,7 @@ module EffectiveLogging
     config.after_initialize do
       if EffectiveLogging.sign_in_enabled || EffectiveLogging.sign_out_enabled
         ActiveSupport.on_load :active_record do
-          if defined?(Devise)
-            EffectiveLogging::UserLogger.create_warden_hooks()
-          else
-            raise ArgumentError.new("EffectiveLogging.sign_in_enabled only works with Devise")
-          end
+          EffectiveLogging::UserLogger.create_warden_hooks()
         end
       end
     end

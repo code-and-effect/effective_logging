@@ -1,33 +1,37 @@
-.panel{:class => "panel-#{bootstrap_class_for_status(log.status)}"}
-  .panel-heading
+.panel.card
+  .panel-heading.card-header
     .row
-      .col-sm-10
+      .col-md-10
         - parents_of_log(log).each do |parent|
-          = link_to(log.message, (request.fullpath.gsub(log.to_param, parent.to_param) rescue '#'))
+          = link_to(log.message, request.fullpath.sub('/' + log.to_param, '/' + parent.to_param))
           = ' > '
         %p= log.message.html_safe
-      .col-sm-2.text-right
-        = link_to 'Prev', request.fullpath.gsub(log.to_param, log.prev_log.try(:to_param).to_s), class: 'btn btn-default', disabled: log.prev_log.blank?
-        = link_to 'Next', request.fullpath.gsub(log.to_param, log.next_log.try(:to_param).to_s), class: 'btn btn-default', disabled: log.next_log.blank?
+      .col-md-2.text-right
+        - if log.prev_log
+          = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + log.prev_log.to_param), class: 'btn btn-primary'
 
-  .panel-body
+        - if log.next_log
+          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + log.prev_log.to_param), class: 'btn btn-primary'
+
+  .panel-body.card-body
     .row
-      .col-lg-6
-        %span.label{:class => "label-#{bootstrap_class_for_status(log.status)}"}= log.status
+      .col-md-6
+        - status_class = bootstrap_class_for_status(log.status)
+        %span.label.badge{:class => "label-#{status_class} badge-#{status_class}"}= log.status
         &nbsp;
-        = log.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        = log.created_at.strftime("%F %H:%M:%S")
         = '(' + time_ago_in_words(log.created_at) + ' ago)'
         %br
         %br
 
-      .col-lg-6
+      .col-md-6
         - if log.user.present?
           %strong User:
           &nbsp;
           = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
         - if (log.associated.present? rescue false)
           %br
-          %strong Regarding:
+          %strong Associated:
           &nbsp;
           - if log.associated.to_s.starts_with?('#<')
             = "#{log.associated.class.name} ##{log.associated.to_param}"
@@ -37,20 +41,21 @@
     - log.details.each do |key, value|
       - next unless value.present?
       .row
-        .col-lg-12
+        .col-md-12
           %p
             %strong= "#{key.to_s.titleize}:"
           = format_log_details_value(log, key)
 
     - if log.logs.present?
       .row
-        .col-lg-12
+        .col-md-12
           %br
           %p
             %strong Additional Entries:
             = "this log contains #{log.logs_count} additional sub entries"
-      - if log.datatable.nil? == false
+
+      - unless log.datatable.nil?
         %hr
         .row
-          .col-lg-12= render_datatable(log.datatable)
+          .col-md-12= render_datatable(log.datatable)
 

@@ -14,7 +14,7 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
+    has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
 
     around_save do |_, block|
       @acts_as_loggable_new_record = new_record?
@@ -72,11 +72,7 @@ module ActsAsLoggable
     return nil unless persisted?
 
     @log_changes_datatable ||= (
-      if Gem::Version.new(EffectiveDatatables::VERSION) < Gem::Version.new('3.0')
-        Effective::Datatables::Logs.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
-      else
-        EffectiveLogsDatatable.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
-      end
+      EffectiveLogsDatatable.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
     )
   end
 

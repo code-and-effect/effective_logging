@@ -1,15 +1,7 @@
-:ruby
-  show_path =
-    if datatable.try(:admin_namespace?)
-      effective_logging.admin_log_path(log)
-    else
-      effective_logging.log_path(log)
-    end
+- show_path = (datatable.admin_namespace? ? effective_logging.admin_log_path(log) : effective_logging.log_path(log))
 
-- if log.logs_count.to_i > 0
-  = link_to show_path, title: 'View' do
-    %span.glyphicon.glyphicon-eye-open
-    = "(#{log.logs_count})"
+- if defined?(EffectiveBootstrap)
+  = show_icon_to(show_path)
 - else
   = link_to show_path, title: 'View' do
     %span.glyphicon.glyphicon-eye-open

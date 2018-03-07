@@ -18,25 +18,18 @@ module EffectiveLogging
         self.log_page_views_opts = logging_options
 
         # Set up the after_filter to do page logging
-        if respond_to?(:after_action)
-          after_action :effective_logging_log_page_view, filter_options
-        else
-          after_filter :effective_logging_log_page_view, filter_options
-        end
+        after_action :effective_logging_log_page_view, filter_options
       end
 
       def skip_log_page_views(options = {})
-        Rails.logger.info("WARNING EffectiveLogging: skip_log_page_views called without first having called log_page_views. Please add 'log_page_views' to your ApplicationController or this controller before using skip_log_page_views") unless options[:quiet]
+        # Nothing
       end
+
     end
 
     module ClassMethods
       def skip_log_page_views(options = {})
-        if respond_to?(:before_action)
-          before_action :skip_log_page_view, options
-        else
-          before_filter :skip_log_page_view, options
-        end
+        before_action :skip_log_page_view, options
       end
     end
 
@@ -45,7 +38,7 @@ module EffectiveLogging
         return if @_effective_logging_skip_log_page_view == true
         return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.parent)
 
-        user = (current_user rescue nil)
+        user = EffectiveLogging.current_user || current_user
 
         if self.class.log_page_views_opts[:details] == false
           ::EffectiveLogger.view("#{request.request_method} #{request.path}", user: user)

@@ -2,8 +2,6 @@
 
 Automatically log all sent emails, user logins, and page views. This also will log custom events from Ruby and JavaScript.
 
-A Rails3 / Rails4 engine to completely handle logging of events.
-
 Logs are stored in a single database table. A Log (one logged event) can have many children Logs, nested to any depth.
 
 Provides a ruby one-liner to log a message, status, user, associated object and any number of additional details.
@@ -294,13 +292,7 @@ Creating child logs via JavaScript is not yet supported.
 
 ## Admin Screen
 
-To use the Admin screen, please also install the [effective_datatables](https://github.com/code-and-effect/effective_datatables/) gem:
-
-```ruby
-gem 'effective_datatables'
-```
-
-Then you should be able to visit:
+Visit:
 
 ```ruby
 link_to 'Logs', effective_logging.admin_logs_path   # /admin/logs
@@ -341,21 +333,9 @@ EffectiveLogsDatatable.new(for: @user.id)
 EffectiveLogsDatatable.new(for: [1, 2, 3])  # Users with ID 1, 2 and 3
 ```
 
-
 ## License
 
 MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
-
-## Testing
-
-The test suite for this gem is unfortunately not yet complete.
-
-Run tests by:
-
-```ruby
-rake spec
-```
-
 
 ## Contributing
 
