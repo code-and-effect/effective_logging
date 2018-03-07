@@ -37,9 +37,8 @@ module EffectiveLogging
 
   def self.statuses
     @statuses ||= (
-      Array(@@additional_statuses).map do |status|
-        status.to_s.downcase
-      end | ['info', 'success', 'error', log_changes_status, ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled), 'view'].compact
+      Array(@@additional_statuses).map { |status| status.to_s.downcase } |  # union
+      ['info', 'success', 'error', 'view', 'change', ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled)].compact
     )
   end
 
