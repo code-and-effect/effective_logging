@@ -1,4 +1,4 @@
-.panel.card
+.panel.panel-default.card
   .panel-heading.card-header
     .row
       .col-md-10
@@ -16,27 +16,24 @@
   .panel-body.card-body
     .row
       .col-md-6
-        - status_class = bootstrap_class_for_status(log.status)
-        %span.label.badge{:class => "label-#{status_class} badge-#{status_class}"}= log.status
-        &nbsp;
-        = log.created_at.strftime("%F %H:%M:%S")
-        = '(' + time_ago_in_words(log.created_at) + ' ago)'
-        %br
-        %br
+        %p
+          - status_class = bootstrap_class_for_status(log.status)
+          %span{:class => (defined?(EffectiveBootstrap) ? "badge badge-#{status_class}" : "label label-#{status_class}")}= log.status
+          = log.created_at.strftime("%F %H:%M:%S")
+          = '(' + time_ago_in_words(log.created_at) + ' ago)'
 
       .col-md-6
         - if log.user.present?
-          %strong User:
-          &nbsp;
-          = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
+          %p
+            %strong User:
+            = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
         - if (log.associated.present? rescue false)
-          %br
-          %strong Associated:
-          &nbsp;
-          - if log.associated.to_s.starts_with?('#<')
-            = "#{log.associated.class.name} ##{log.associated.to_param}"
-          - else
-            = log.associated
+          %p
+            %strong Associated:
+            - if log.associated.to_s.starts_with?('#<')
+              = "#{log.associated.class.name} ##{log.associated.to_param}"
+            - else
+              = log.associated
 
     - log.details.each do |key, value|
       - next unless value.present?
@@ -47,15 +44,9 @@
           = format_log_details_value(log, key)
 
     - if log.logs.present?
-      .row
-        .col-md-12
-          %br
-          %p
-            %strong Additional Entries:
-            = "this log contains #{log.logs_count} additional sub entries"
+      %hr
+      %p This log contains #{log.logs_count} additional sub entries:
 
       - unless log.datatable.nil?
-        %hr
-        .row
-          .col-md-12= render_datatable(log.datatable)
+        = render_datatable(log.datatable)
 
