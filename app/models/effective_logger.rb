@@ -2,6 +2,8 @@
 
 class EffectiveLogger
   def self.log(message, status = EffectiveLogging.statuses.first, options = {})
+    options = Hash(options).delete_if { |k, v| v.blank? }
+
     if options[:user].present? && !options[:user].kind_of?(User)
       raise ArgumentError.new('Log.log :user => ... argument must be a User object')
     end
@@ -14,20 +16,6 @@ class EffectiveLogger
       raise ArgumentError.new('Log.log :associated => ... argument must be an ActiveRecord::Base object')
     end
 
-    log = Effective::Log.new(
-      message: message,
-      status: status,
-      user_id: options.delete(:user_id),
-      user: options.delete(:user),
-      parent: options.delete(:parent),
-      associated: options.delete(:associated),
-      associated_to_s: options.delete(:associated_to_s)
-    )
-
-    if log.associated.present?
-      log.associated_to_s ||= (log.associated.to_s rescue nil)
-    end
-
     if options[:request].present? && options[:request].respond_to?(:referrer)
       request = options.delete(:request)
 
@@ -36,9 +24,24 @@ class EffectiveLogger
       options[:user_agent] ||= request.user_agent
     end
 
-    log.details = options.delete_if { |k, v| v.blank? } if options.kind_of?(Hash)
+    log = Effective::Log.new(
+      message: message,
+      status: status,
+      user_id: options.delete(:user_id),
+      user: options.delete(:user),
+      parent: options.delete(:parent),
+      associated: options.delete(:associated),
+      associated_to_s: options.delete(:associated_to_s),
+      details: options
+    )
 
-    log.save
+    if log.associated.present?
+      log.associated_to_s ||= log.associated.to_s
+    end
+
+    log.save!
+
+    log
   end
 
   # Dynamically add logging methods based on the defined statuses
