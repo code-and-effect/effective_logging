@@ -15,6 +15,8 @@ module EffectiveLogging
   mattr_accessor :sign_in_enabled
   mattr_accessor :sign_out_enabled
 
+  mattr_accessor :supressed
+
   def self.setup
     yield self
   end
@@ -37,11 +39,11 @@ module EffectiveLogging
   end
 
   def self.supressed(&block)
-    @supressed = true; yield; @supressed = false
+    @@supressed = true; yield; @@supressed = false
   end
 
   def self.supressed?
-    @supressed == true
+    @@supressed == true
   end
 
   def self.statuses

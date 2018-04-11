@@ -2,6 +2,8 @@
 
 class EffectiveLogger
   def self.log(message, status = EffectiveLogging.statuses.first, options = {})
+    return if EffectiveLogging.supressed?
+
     options = Hash(options).delete_if { |k, v| v.blank? }
 
     if options[:user].present? && !options[:user].kind_of?(User)

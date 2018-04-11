@@ -20,7 +20,7 @@ module ActsAsLoggable
   included do
     has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
 
-    around_save do |_, block|
+    around_save(unless: -> { EffectiveLogging.supressed? }) do |_, block|
       @acts_as_loggable_new_record = new_record?
 
       unless @acts_as_loggable_new_record
@@ -31,13 +31,13 @@ module ActsAsLoggable
       true
     end
 
-    before_destroy do
+    before_destroy(unless: -> { EffectiveLogging.supressed? }) do
       @acts_as_loggable_destroy_record = true
       ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
       true
     end
 
-    after_commit do
+    after_commit(unless: -> { EffectiveLogging.supressed? }) do
       if @acts_as_loggable_new_record
         ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
       elsif !@acts_as_loggable_destroy_record && @acts_as_loggable_update_record

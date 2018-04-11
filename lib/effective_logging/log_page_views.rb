@@ -35,6 +35,7 @@ module EffectiveLogging
 
     module InstanceMethods
       def effective_logging_log_page_view
+        return if EffectiveLogging.supressed?
         return if @_effective_logging_skip_log_page_view == true
         return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.parent)
 

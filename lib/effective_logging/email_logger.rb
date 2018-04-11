@@ -1,6 +1,7 @@
 module EffectiveLogging
   class EmailLogger
     def self.delivering_email(message)
+      return if EffectiveLogging.supressed?
       return unless message.present?
 
       # collect a Hash of arguments used to invoke EffectiveLogger.success
