@@ -7,6 +7,14 @@ module EffectiveLogging
         end
       end
 
+      Warden::Manager.after_set_user do |user, warden, opts|
+        if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
+          if opts && opts[:event] == :set_user && !opts.key?(:store) # User has just reset their password and signed in
+            ::EffectiveLogger.sign_in('Sign in', user: user, associated: user, request: warden.request, notes: 'after password reset')
+          end
+        end
+      end
+
       Warden::Manager.before_logout do |user, warden, opts|
         if EffectiveLogging.sign_out_enabled && !EffectiveLogging.supressed?
           if user.respond_to?(:timedout?) && user.respond_to?(:timeout_in)
