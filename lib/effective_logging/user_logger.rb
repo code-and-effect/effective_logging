@@ -3,24 +3,7 @@ module EffectiveLogging
     def self.create_warden_hooks
       Warden::Manager.after_authentication do |user, warden, opts|
         if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
-          ::EffectiveLogger.sign_in('Sign in',
-            user: user,
-            associated: user,
-            request: warden.request
-          )
-        end
-      end
-
-      Warden::Manager.after_set_user do |user, warden, opts|
-        if EffectiveLogging.sign_in_enabled && !EffectiveLogging.supressed?
-          if (opts[:event] == :set_user rescue false) # User has just reset their password and signed in
-            ::EffectiveLogger.sign_in('Sign in',
-              user: user,
-              associated: user,
-              request: warden.request,
-              notes: 'after password reset'
-            )
-          end
+          ::EffectiveLogger.sign_in('Sign in', user: user, associated: user, request: warden.request)
         end
       end
 
