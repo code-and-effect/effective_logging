@@ -18,7 +18,7 @@ class EffectiveLogsDatatable < Effective::Datatable
     end
 
     unless attributes[:log_changes]
-      col :associated_type, search: { as: :string }, visible: false
+      col :associated_type, search: { as: :string }
       col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
       col :associated_to_s, search: { as: :string }, label: 'Associated'
     end
