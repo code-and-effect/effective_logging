@@ -9,7 +9,7 @@ module ActsAsLoggable
         raise ArgumentError.new('invalid arguments passed to (effective_logging) log_changes. Example usage: log_changes except: [:created_at]')
       end
 
-      if (unknown = (@acts_as_loggable_options.keys - [:only, :except, :additionally, :include_associated])).present?
+      if (unknown = (@acts_as_loggable_options.keys - [:only, :except, :additionally, :include_associated, :include_nested])).present?
         raise ArgumentError.new("unknown keyword: #{unknown.join(', ')}")
       end
 
@@ -52,7 +52,8 @@ module ActsAsLoggable
       only: Array(@acts_as_loggable_options[:only]).map { |attribute| attribute.to_s },
       except: Array(@acts_as_loggable_options[:except]).map { |attribute| attribute.to_s },
       additionally: Array(@acts_as_loggable_options[:additionally]).map { |attribute| attribute.to_s },
-      include_associated: @acts_as_loggable_options.fetch(:include_associated, true)
+      include_associated: @acts_as_loggable_options.fetch(:include_associated, true),
+      include_nested: @acts_as_loggable_options.fetch(:include_nested, true)
     }
 
     if name == 'User'
