@@ -1,17 +1,18 @@
 .panel.panel-default.card
   .panel-heading.card-header
     .row
-      .col-md-10
+      .col-md-8
         - parents_of_log(log).each do |parent|
           = link_to(log.message, request.fullpath.sub('/' + log.to_param, '/' + parent.to_param))
           = ' > '
         %p= log.message.html_safe
-      .col-md-2.text-right
+
+      .col-md-4.text-right
         - if log.prev_log
           = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + log.prev_log.to_param), class: 'btn btn-primary'
 
         - if log.next_log
-          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + log.prev_log.to_param), class: 'btn btn-primary'
+          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + log.next_log.to_param), class: 'btn btn-primary'
 
   .panel-body.card-body
     .row
