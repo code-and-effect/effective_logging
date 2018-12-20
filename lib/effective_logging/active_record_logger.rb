@@ -9,7 +9,6 @@ module EffectiveLogging
 
       @object = object
       @resource = Effective::Resource.new(object)
-      @logged = false # If work was done
 
       @logger = options.delete(:logger) || object
       @depth = options.delete(:depth) || 0
@@ -20,11 +19,12 @@ module EffectiveLogging
       raise ArgumentError.new('logger must respond to logged_changes') unless @logger.respond_to?(:logged_changes)
     end
 
-    # execute! is called when we recurse, otherwise the following methods are best called individually
     def execute!
+      @logged = false
+
       if new_record?(object)
         created!
-      elsif object.marked_for_destruction?
+      elsif destroyed_record?(object)
         destroyed!
       else
         changed!
@@ -35,22 +35,19 @@ module EffectiveLogging
       @logged
     end
 
-    # before_destroy
     def destroyed!
-      log('Deleted')
+      log('Deleted', associated: '')
     end
 
-    # after_commit
     def created!
-      log('Created', details: applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)))
+      details = applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
+      log('Created', details: details)
     end
 
-    # after_commit
     def updated!
-      log('Updated', details: applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)))
+      details = applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
+      log('Updated', details: details) if details.present?
     end
-
-    private
 
     def changed!
       applicable(resource.instance_changes).each do |attribute, (before, after)|
@@ -84,14 +81,16 @@ module EffectiveLogging
       end
     end
 
-    def log(message, details: {})
+    private
+
+    def log(message, associated: nil, details: {})
       @logged = true
 
       log = logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
-        associated_to_s: (logger.to_s rescue nil),
+        associated_to_s: ((associated || logger).to_s rescue nil),
         details: details
       )
 
@@ -101,7 +100,6 @@ module EffectiveLogging
 
     # TODO: Make this work better with nested objects
     def applicable(attributes)
-
       atts = if options[:only].present?
         attributes.stringify_keys.slice(*options[:only])
       elsif options[:except].present?
@@ -127,6 +125,13 @@ module EffectiveLogging
       return true if object.respond_to?(:previous_changes) && object.previous_changes.key?('id') && object.previous_changes['id'].first.nil?
       false
     end
+
+    def destroyed_record?(object)
+      return true if object.respond_to?(:marked_for_destruction?) && object.marked_for_destruction?
+      return true if object.respond_to?(:previous_changes) && object.previous_changes.key?('id') && object.previous_changes['id'].last.nil?
+      false
+    end
+
   end
 
 end

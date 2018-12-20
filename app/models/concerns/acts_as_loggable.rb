@@ -20,34 +20,6 @@ module ActsAsLoggable
   included do
     has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
 
-    around_save(unless: -> { EffectiveLogging.supressed? }) do |_, block|
-      @acts_as_loggable_new_record = new_record?
-
-      unless @acts_as_loggable_new_record
-        @acts_as_loggable_update_record = ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
-      end
-
-      block.call
-      true
-    end
-
-    before_destroy(unless: -> { EffectiveLogging.supressed? }) do
-      @acts_as_loggable_destroy_record = true
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
-      true
-    end
-
-    after_commit(unless: -> { EffectiveLogging.supressed? }) do
-      if @acts_as_loggable_new_record
-        ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
-      elsif !@acts_as_loggable_destroy_record && @acts_as_loggable_update_record
-        ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
-      end
-
-      true
-    end
-
-    # Parse Options
     log_changes_options = {
       only: Array(@acts_as_loggable_options[:only]).map { |attribute| attribute.to_s },
       except: Array(@acts_as_loggable_options[:except]).map { |attribute| attribute.to_s },
@@ -61,6 +33,20 @@ module ActsAsLoggable
     end
 
     self.send(:define_method, :log_changes_options) { log_changes_options }
+
+    after_create(unless: -> { EffectiveLogging.supressed? }) do
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+    end
+
+    after_destroy(unless: -> { EffectiveLogging.supressed? }) do
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+    end
+
+    after_update(unless: -> { EffectiveLogging.supressed? }) do
+      if ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+        ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
+      end
+    end
   end
 
   module ClassMethods
