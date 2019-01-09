@@ -34,18 +34,14 @@ module EffectiveLogging
     end
 
     def destroyed!
-      @logged = false
       log('Deleted', details: applicable(instance_attributes))
     end
 
     def created!
-      @logged = false
       log('Created', details: applicable(instance_attributes))
     end
 
     def updated!
-      @logged = false
-
       log_resource_changes!
       log_nested_resources!
 
@@ -142,6 +138,7 @@ module EffectiveLogging
     end
 
     def destroyed_record?(object)
+      return true if object.respond_to?(:destroyed?) && object.destroyed?
       return true if object.respond_to?(:marked_for_destruction?) && object.marked_for_destruction?
       return true if object.respond_to?(:previous_changes) && object.previous_changes.key?('id') && object.previous_changes['id'].last.nil?
       false

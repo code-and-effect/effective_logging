@@ -35,15 +35,15 @@ module ActsAsLoggable
     self.send(:define_method, :log_changes_options) { log_changes_options }
 
     after_create(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
     end
 
     after_destroy(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
     end
 
     after_update(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
     end
   end
 
