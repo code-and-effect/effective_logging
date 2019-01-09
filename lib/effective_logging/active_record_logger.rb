@@ -27,29 +27,31 @@ module EffectiveLogging
       elsif destroyed_record?(object)
         destroyed!
       else
-        changed!
+        updated!
       end
 
-      log_nested_resources! if include_associated
-
-      @logged
+      logged?
     end
 
     def destroyed!
-      log('Deleted', associated: '')
+      @logged = false
+      log('Deleted', associated: '', details: applicable(instance_attributes))
     end
 
     def created!
-      details = applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
-      log('Created', details: details)
+      @logged = false
+      log('Created', details: applicable(instance_attributes)) && log_nested_resources!
     end
 
     def updated!
-      details = applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
-      log('Updated', details: details) if details.present?
+      @logged = false
+
+      log_resource_changes! && log_nested_resources!
+
+      log('Updated', details: applicable(instance_attributes)) if logged?
     end
 
-    def changed!
+    def log_resource_changes!
       applicable(resource.instance_changes).each do |attribute, (before, after)|
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
@@ -68,6 +70,8 @@ module EffectiveLogging
     end
 
     def log_nested_resources!
+      return unless include_associated
+
       # Log changes on all accepts_as_nested_parameters has_many associations
       resource.nested_resources.each do |association|
         title = association.name.to_s.singularize.titleize
@@ -82,6 +86,10 @@ module EffectiveLogging
     end
 
     private
+
+    def instance_attributes # effective_resources gem
+      resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)
+    end
 
     def log(message, associated: nil, details: {})
       @logged = true
@@ -116,7 +124,7 @@ module EffectiveLogging
       end
 
       # Blacklist
-      atts.except(:logged_changes, :trash, 'logged_changes', 'trash')
+      atts.except(:logged_changes, :trash, :updated_at, 'logged_changes', 'trash', 'updated_at')
     end
 
     def new_record?(object)
@@ -130,6 +138,10 @@ module EffectiveLogging
       return true if object.respond_to?(:marked_for_destruction?) && object.marked_for_destruction?
       return true if object.respond_to?(:previous_changes) && object.previous_changes.key?('id') && object.previous_changes['id'].last.nil?
       false
+    end
+
+    def logged?
+      @logged == true
     end
 
   end
