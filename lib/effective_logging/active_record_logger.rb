@@ -35,20 +35,21 @@ module EffectiveLogging
 
     def destroyed!
       @logged = false
-      log('Deleted', associated: '', details: applicable(instance_attributes))
+      log('Deleted', details: applicable(instance_attributes))
     end
 
     def created!
       @logged = false
-      log('Created', details: applicable(instance_attributes)) && log_nested_resources!
+      log('Created', details: applicable(instance_attributes))
     end
 
     def updated!
       @logged = false
 
-      log_resource_changes! && log_nested_resources!
+      log_resource_changes!
+      log_nested_resources!
 
-      log('Updated', details: applicable(instance_attributes)) if logged?
+      log('Updated', details: applicable(instance_attributes)) if logged? && depth == 0
     end
 
     def log_resource_changes!
@@ -70,7 +71,7 @@ module EffectiveLogging
     end
 
     def log_nested_resources!
-      return unless include_associated
+      return unless include_nested
 
       # Log changes on all accepts_as_nested_parameters has_many associations
       resource.nested_resources.each do |association|
@@ -79,7 +80,9 @@ module EffectiveLogging
         Array(object.send(association.name)).each_with_index do |child, index|
           next unless child.present?
 
-          child_options = options.merge(logger: logger, depth: depth+1, include_associated: include_associated, include_nested: include_nested, prefix: "#{title} #{index} - #{child} - ")
+          child_options = options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ", include_associated: include_associated, include_nested: include_nested)
+          child_options = child_options.merge(child.log_changes_options) if child.respond_to?(:log_changes_options)
+
           @logged = true if ::EffectiveLogging::ActiveRecordLogger.new(child, child_options).execute!
         end
       end
@@ -91,19 +94,23 @@ module EffectiveLogging
       resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)
     end
 
-    def log(message, associated: nil, details: {})
+    def log(message, details: {})
       @logged = true
 
       log = logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
-        associated_to_s: ((associated || logger).to_s rescue nil),
+        associated_to_s: (logger.to_s rescue nil),
         details: details
       )
 
       log.save
       log
+    end
+
+    def logged?
+      @logged == true
     end
 
     # TODO: Make this work better with nested objects
@@ -139,11 +146,6 @@ module EffectiveLogging
       return true if object.respond_to?(:previous_changes) && object.previous_changes.key?('id') && object.previous_changes['id'].last.nil?
       false
     end
-
-    def logged?
-      @logged == true
-    end
-
   end
 
 end
