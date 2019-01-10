@@ -121,11 +121,13 @@ module EffectiveLogging
     # A parent is a belongs_to that accepts_nested_attributes for this resource
     def log_changes_parents
       resource.belong_tos.map do |association|
+        parent_klass = (association.options[:polymorphic] ? object.public_send(association.name).class : association.klass)
+
         # Skip if the parent doesn't log_changes
-        next unless association.klass.respond_to?(:log_changes)
+        next unless parent_klass.respond_to?(:log_changes)
 
         # Skip unless the parent accepts_nested_attributes
-        next unless Effective::Resource.new(association.klass).nested_resources.find { |ass| ass.plural_name == resource.plural_name }
+        next unless Effective::Resource.new(parent_klass).nested_resources.find { |ass| ass.plural_name == resource.plural_name }
 
         parent = object.public_send(association.name).presence
 
