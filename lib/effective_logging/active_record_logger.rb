@@ -1,6 +1,6 @@
 module EffectiveLogging
   class ActiveRecordLogger
-    attr_accessor :object, :resource, :logger, :depth, :include_associated, :include_nested, :options
+    attr_accessor :object, :resource, :logger, :depth, :include_associated, :include_nested, :log_parents, :options
 
     BLANK = "''"
 
@@ -10,10 +10,11 @@ module EffectiveLogging
       @object = object
       @resource = Effective::Resource.new(object)
 
-      @logger = options.delete(:logger) || object
-      @depth = options.delete(:depth) || 0
+      @logger = options.fetch(:logger, object)
+      @depth = options.fetch(:depth, 0)
       @include_associated = options.fetch(:include_associated, true)
       @include_nested = options.fetch(:include_nested, true)
+      @log_parents = options.fetch(:log_parents, true)
       @options = options
 
       raise ArgumentError.new('logger must respond to logged_changes') unless @logger.respond_to?(:logged_changes)
@@ -34,18 +35,18 @@ module EffectiveLogging
     end
 
     def destroyed!
-      log('Deleted', details: applicable(instance_attributes))
+      log('Deleted', applicable(instance_attributes))
     end
 
     def created!
-      log('Created', details: applicable(instance_attributes))
+      log('Created', applicable(instance_attributes))
     end
 
     def updated!
       log_resource_changes!
       log_nested_resources!
 
-      log('Updated', details: applicable(instance_attributes)) if logged? && depth == 0
+      (logged? && depth == 0) ? log('Updated', applicable(instance_attributes)) : true
     end
 
     def log_resource_changes!
@@ -62,7 +63,7 @@ module EffectiveLogging
           object.log_changes_formatted_attribute(attribute)
         end || attribute.titleize
 
-        log("#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}", details: { attribute: attribute, before: before, after: after })
+        log("#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}", { attribute: attribute, before: before, after: after })
       end
     end
 
@@ -79,34 +80,63 @@ module EffectiveLogging
           child_options = options.merge(logger: logger, depth: depth+1, prefix: "#{title} #{index} - #{child} - ", include_associated: include_associated, include_nested: include_nested)
           child_options = child_options.merge(child.log_changes_options) if child.respond_to?(:log_changes_options)
 
-          @logged = true if ::EffectiveLogging::ActiveRecordLogger.new(child, child_options).execute!
+          @logged = true if ActiveRecordLogger.new(child, child_options).execute!
         end
       end
     end
 
-    private
-
-    def instance_attributes # effective_resources gem
-      resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)
-    end
-
-    def log(message, details: {})
-      @logged = true
-
+    def log(message, details)
       log = logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: "#{"\t" * depth}#{options[:prefix]}#{message}",
         associated_to_s: (logger.to_s rescue nil),
-        details: details
+        details: (details.presence || {})
       )
 
-      log.save
+      log_changes_to_parents(message, details) if depth == 0 && log_parents
+
+      @logged = log.save!
       log
     end
 
+    def log_changes_to_parents(message, details)
+      log_changes_parents.each do |parent|
+        title = object.class.name.to_s.singularize.titleize
+        parent_options = { logger: parent, prefix: "#{title} - #{object} - " }
+        ActiveRecordLogger.new(parent, parent_options).log(message, details)
+      end
+    end
+
+    private
+
     def logged?
       @logged == true
+    end
+
+    def instance_attributes # effective_resources gem
+      resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)
+    end
+
+    # A parent is a belongs_to that accepts_nested_attributes for this resource
+    def log_changes_parents
+      resource.belong_tos.map do |association|
+        # Skip if the parent doesn't log_changes
+        next unless association.klass.respond_to?(:log_changes)
+
+        # Skip unless the parent accepts_nested_attributes
+        next unless Effective::Resource.new(association.klass).nested_resources.find { |ass| ass.plural_name == resource.plural_name }
+
+        parent = object.public_send(association.name).presence
+
+        # Sanity check
+        next unless parent.respond_to?(:log_changes_options)
+
+        # Skip if the parent does not log its nested or associated items
+        next unless parent.log_changes_options[:include_nested] || parent.log_changes_options[:include_associated]
+
+        parent
+      end.compact
     end
 
     # TODO: Make this work better with nested objects
