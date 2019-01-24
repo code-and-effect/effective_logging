@@ -159,7 +159,7 @@ module EffectiveLogging
       end
 
       # Blacklist
-      atts.except(:logged_changes, :trash, :updated_at, 'logged_changes', 'trash', 'updated_at')
+      atts.except(:logged_changes, :trash, :updated_at, :status_steps, 'logged_changes', 'trash', 'updated_at', 'status_steps')
     end
 
     def new_record?(object)
