@@ -35,19 +35,20 @@ module ActsAsLoggable
     self.send(:define_method, :log_changes_options) { log_changes_options }
 
     after_create(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
     end
 
     after_destroy(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
     end
 
     after_update(unless: -> { EffectiveLogging.supressed? }) do
-      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).execute!
+      ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
     end
   end
 
   module ClassMethods
+    def acts_as_loggable?; true; end
   end
 
   # Regular instance methods
@@ -68,14 +69,7 @@ module ActsAsLoggable
 
   def log_changes_datatable
     return nil unless persisted?
-
-    @log_changes_datatable ||= (
-      EffectiveLogsDatatable.new(associated_id: id, associated_type: self.class.name, log_changes: true, status: false)
-    )
-  end
-
-  def refresh_datatables
-    @refresh_datatables ||= [:effective_logs]
+    EffectiveLogChangesDatatable.new(associated_id: id, associated_type: self.class.name)
   end
 
 end
