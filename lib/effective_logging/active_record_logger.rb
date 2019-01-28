@@ -20,32 +20,32 @@ module EffectiveLogging
     end
 
     def destroyed!
-      log('Deleted', applicable(instance_attributes))
+      log('Deleted', resource_attributes)
     end
 
     def created!
-      log('Created', applicable(instance_attributes))
+      log('Created', resource_attributes)
     end
 
     def updated!
       log_resource_changes!
-      log('Updated', applicable(instance_attributes))
+      log('Updated', resource_attributes)
     end
 
     def log(message, details)
-      logger.logged_changes.create!(
+      logger.logged_changes.build(
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: [options[:prefix].presence, message].compact.join(' '),
         associated_to_s: (logger.to_s rescue nil),
         details: (details.presence || {})
-      )
+      ).tap { |log| log.save! }
     end
 
     private
 
     def log_resource_changes!
-      applicable(resource.instance_changes).each do |attribute, (before, after)|
+      resource_changes.each do |attribute, (before, after)|
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
@@ -62,8 +62,12 @@ module EffectiveLogging
       end
     end
 
-    def instance_attributes # effective_resources gem
-      resource.instance_attributes(include_associated: include_associated, include_nested: include_nested)
+    def resource_attributes # effective_resources gem
+      applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
+    end
+
+    def resource_changes # effective_resources gem
+      applicable(resource.instance_changes)
     end
 
     def applicable(attributes)
