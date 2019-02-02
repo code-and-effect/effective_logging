@@ -5,7 +5,7 @@
         - parents_of_log(log).each do |parent|
           = link_to(log.message, request.fullpath.sub('/' + log.to_param, '/' + parent.to_param))
           = ' > '
-        %p= log.message.html_safe
+        %p= log.message.to_s.gsub("\n", '<br>').html_safe
 
       .col-md-4.text-right
         - if log.prev_log

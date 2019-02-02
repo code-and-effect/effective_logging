@@ -11,7 +11,7 @@ class CreateEffectiveLogging < ActiveRecord::Migration[4.2]
 
       t.integer       :logs_count
 
-      t.string        :message
+      t.text          :message
       t.text          :details
 
       t.string        :status

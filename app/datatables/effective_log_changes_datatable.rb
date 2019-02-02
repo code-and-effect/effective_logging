@@ -12,11 +12,14 @@ class EffectiveLogChangesDatatable < Effective::Datatable
     col :associated_to_s, visible: false
 
     col :message, sort: false do |log|
+      message = log.message.gsub("\n", '<br>')
+
       if log.associated_type == attributes[:associated_type]
-        log.message
+        message
       else
-        "#{log.associated_type} #{log.associated_to_s} - #{log.message}"
+        "#{log.associated_type} #{log.associated_to_s} - #{message}"
       end
+
     end.search do |collection, term, column, sql_column|
       collection.where("associated_type #{resource.ilike} ? OR associated_to_s #{resource.ilike} ? OR message #{resource.ilike} ?", "%#{term}%", "%#{term}%", "%#{term}%")
     end

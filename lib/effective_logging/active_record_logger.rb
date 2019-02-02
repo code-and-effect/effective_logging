@@ -19,6 +19,7 @@ module EffectiveLogging
       raise ArgumentError.new('logger must respond to logged_changes') unless @logger.respond_to?(:logged_changes)
     end
 
+    # Effective::Log.where(message: 'Deleted').where('details ILIKE ?', '%lab_test_id: 263%')
     def destroyed!
       log('Deleted', resource_attributes)
     end
@@ -28,8 +29,15 @@ module EffectiveLogging
     end
 
     def updated!
-      log_resource_changes!
-      log('Updated', resource_attributes)
+      changes = resource_changes
+
+      return true if changes.blank? # If you just click save and change nothing, don't log it.
+
+      message = (['Updated'] + changes.map do |attribute, (before, after)|
+        "#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}"
+      end).join("\n")
+
+      log(message, resource_attributes.merge(changes: changes))
     end
 
     def log(message, details)
@@ -44,8 +52,12 @@ module EffectiveLogging
 
     private
 
-    def log_resource_changes!
-      resource_changes.each do |attribute, (before, after)|
+    def resource_attributes # effective_resources gem
+      applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
+    end
+
+    def resource_changes # effective_resources gem
+      applicable(resource.instance_changes).inject({}) do |h, (attribute, (before, after))|
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
@@ -58,16 +70,8 @@ module EffectiveLogging
           object.log_changes_formatted_attribute(attribute)
         end || attribute.titleize
 
-        log("#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}", { attribute: attribute, before: before, after: after })
+        h[attribute] = [before, after]; h
       end
-    end
-
-    def resource_attributes # effective_resources gem
-      applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
-    end
-
-    def resource_changes # effective_resources gem
-      applicable(resource.instance_changes)
     end
 
     def applicable(attributes)

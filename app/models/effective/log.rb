@@ -22,7 +22,7 @@ module Effective
     # associated_type     :string
     # associated_id       :integer
     # associated_to_s     :string
-    # message             :string
+    # message             :text
     # details             :text
     # status              :string
     # timestamps
@@ -37,10 +37,6 @@ module Effective
 
     def to_s
       "Log #{id}"
-    end
-
-    def message=(msg)
-      write_attribute(:message, msg.kind_of?(String) ? msg.to_s[0...255] : msg)
     end
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})

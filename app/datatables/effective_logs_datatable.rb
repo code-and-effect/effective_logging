@@ -23,12 +23,8 @@ class EffectiveLogsDatatable < Effective::Datatable
       col :associated_to_s, search: { as: :string }, label: 'Associated'
     end
 
-    if attributes[:log_changes]
-      col :message do |log|
-        log.message.starts_with?("\t") ? log.message.gsub("\t", "&nbsp;&nbsp;") : log.message
-      end
-    else
-      col :message
+    col :message do |log|
+      log.message.gsub("\n", '<br>')
     end
 
     col :logs_count, visible: false
