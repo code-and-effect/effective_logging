@@ -5,7 +5,7 @@ class EffectiveLogChangesDatatable < Effective::Datatable
     col :updated_at, label: 'Date'
     col :id, visible: false
 
-    col :user
+    col :user, sort: false
 
     col :associated_type, visible: false
     col :associated_id, visible: false

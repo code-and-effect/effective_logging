@@ -5,6 +5,9 @@ class CreateEffectiveLogging < ActiveRecord::Migration[4.2]
 
       t.integer       :user_id
 
+      t.string        :changes_to_type
+      t.integer       :changes_to_id
+
       t.string        :associated_type
       t.integer       :associated_id
       t.string        :associated_to_s
