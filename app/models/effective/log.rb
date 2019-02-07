@@ -21,6 +21,9 @@ module Effective
     # Attributes
     # logs_count          :integer  # Rails Counter Cache
 
+    # changes_to_type     :string
+    # changes_to_id       :string
+
     # associated_type     :string
     # associated_id       :integer
     # associated_to_s     :string

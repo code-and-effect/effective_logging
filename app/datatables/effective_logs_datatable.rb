@@ -17,11 +17,9 @@ class EffectiveLogsDatatable < Effective::Datatable
       col :status, search: { collection: EffectiveLogging.statuses }
     end
 
-    unless attributes[:log_changes]
-      col :associated_type, search: { as: :string }
-      col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
-      col :associated_to_s, search: { as: :string }, label: 'Associated'
-    end
+    col :associated_type, search: { as: :string }
+    col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
+    col :associated_to_s, search: { as: :string }, label: 'Associated'
 
     col :message do |log|
       log.message.gsub("\n", '<br>')
@@ -42,10 +40,6 @@ class EffectiveLogsDatatable < Effective::Datatable
   # If we set a log_id then it's for sub logs
   collection do
     scope = Effective::Log.deep.where(parent_id: attributes[:log_id])
-
-    if attributes[:log_changes]
-      scope = scope.where(status: EffectiveLogging.log_changes_status)
-    end
 
     if attributes[:for]
       user_ids = Array(attributes[:for])

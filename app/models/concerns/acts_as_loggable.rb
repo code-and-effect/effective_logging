@@ -23,12 +23,12 @@ module ActsAsLoggable
     log_changes_options = {
       to: @acts_as_loggable_options[:to],
       prefix: @acts_as_loggable_options[:prefix],
-      only: Array(@acts_as_loggable_options[:only]).map { |attribute| attribute.to_s },
-      except: Array(@acts_as_loggable_options[:except]).map { |attribute| attribute.to_s },
+      only: Array(@acts_as_loggable_options[:only]),
+      except: Array(@acts_as_loggable_options[:except])
     }
 
     if name == 'User'
-      log_changes_options[:except] += %w(sign_in_count current_sign_in_at current_sign_in_ip last_sign_in_at last_sign_in_ip encrypted_password remember_created_at reset_password_token invitation_sent_at invitation_created_at invitation_token)
+      log_changes_options[:except] += %i(sign_in_count current_sign_in_at current_sign_in_ip last_sign_in_at last_sign_in_ip encrypted_password remember_created_at reset_password_token invitation_sent_at invitation_created_at invitation_token)
     end
 
     self.send(:define_method, :log_changes_options) { log_changes_options }
