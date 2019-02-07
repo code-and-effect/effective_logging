@@ -5,23 +5,16 @@ module EffectiveLogging
     BLANK = "''"
     BLACKLIST = [:updated_at, :created_at, :encrypted_password, :status_steps] # Don't log changes or attributes
 
-    def initialize(object, to: nil, include_associated: true, include_nested: true, prefix: nil, only: nil, except: nil, additionally: nil)
+    def initialize(object, to: nil, prefix: nil, only: nil, except: nil)
       @object = object
       @resource = Effective::Resource.new(object)
 
       # Validate changes_to value
-      if to.present? && !(to.kind_of?(Symbol) && @resource.belong_tos.map(&:name).include?(to))
+      if to.present? && !@resource.belong_tos.map(&:name).include?(to)
         raise ArgumentError.new("unable to find existing belongs_to relationship matching #{to}. Expected a symbol matching a belongs_to.")
       end
 
-      @options = {
-        include_associated: include_associated,
-        include_nested: include_nested,
-        prefix: prefix,
-        only: only,
-        except: except,
-        additionally: additionally
-      }.compact
+      @options = { to: to, prefix: prefix, only: only, except: Array(except) + BLACKLIST }.compact
     end
 
     # Effective::Log.where(message: 'Deleted').where('details ILIKE ?', '%lab_test_id: 263%')
@@ -72,11 +65,11 @@ module EffectiveLogging
     end
 
     def resource_attributes # effective_resources gem
-      applicable(resource.instance_attributes(include_associated: options[:include_associated], include_nested: options[:include_nested]))
+      resource.instance_attributes(only: options[:only], except: options[:except])
     end
 
     def resource_changes # effective_resources gem
-      applicable(resource.instance_changes).inject({}) do |h, (attribute, (before, after))|
+      resource.instance_changes(only: options[:only], except: options[:except]).inject({}) do |h, (attribute, (before, after))|
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
@@ -87,32 +80,11 @@ module EffectiveLogging
 
         attribute = if object.respond_to?(:log_changes_formatted_attribute)
           object.log_changes_formatted_attribute(attribute)
-        end || attribute.titleize
+        end || attribute.to_s.titleize
 
         h[attribute] = [before, after]; h
       end
     end
-
-    def applicable(attributes)
-      atts = if options[:only].present?
-        attributes.stringify_keys.slice(*options[:only])
-      elsif options[:except].present?
-        attributes.stringify_keys.except(*options[:except])
-      else
-        attributes
-      end
-
-      (options[:additionally] || []).each do |attribute|
-        value = (object.send(attribute) rescue :effective_logging_nope)
-        next if attributes[attribute].present? || value == :effective_logging_nope
-
-        atts[attribute] = value
-      end
-
-      # Blacklist
-      atts.except(*(BLACKLIST + BLACKLIST.map(&:to_s)))
-    end
-
   end
 
 end

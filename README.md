@@ -233,9 +233,7 @@ class Post < ActiveRecord::Base
 end
 ```
 
-There is some initial support for passing `only`, `except`, and `additionally` to the mixin to customize what attributes are saved.
-
-Define your model with `log_changes additionally: [:method1, :method2]` to also _always_ log the value of that method. Even if it's unchanged.
+There is some initial support for passing `only`, and `except`, to the mixin to customize what attributes are saved.
 
 Apply your own formatting to the logged title of each attribute by creating an instance method on the resource:
 

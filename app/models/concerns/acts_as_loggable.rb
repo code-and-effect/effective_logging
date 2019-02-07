@@ -9,7 +9,7 @@ module ActsAsLoggable
         raise ArgumentError.new('invalid arguments passed to (effective_logging) log_changes. Example usage: log_changes except: [:created_at]')
       end
 
-      if (unknown = (@acts_as_loggable_options.keys - [:to, :only, :except, :additionally, :include_associated, :include_nested])).present?
+      if (unknown = (@acts_as_loggable_options.keys - [:to, :prefix, :only, :except])).present?
         raise ArgumentError.new("unknown keyword: #{unknown.join(', ')}")
       end
 
@@ -22,11 +22,9 @@ module ActsAsLoggable
 
     log_changes_options = {
       to: @acts_as_loggable_options[:to],
+      prefix: @acts_as_loggable_options[:prefix],
       only: Array(@acts_as_loggable_options[:only]).map { |attribute| attribute.to_s },
       except: Array(@acts_as_loggable_options[:except]).map { |attribute| attribute.to_s },
-      additionally: Array(@acts_as_loggable_options[:additionally]).map { |attribute| attribute.to_s },
-      include_associated: @acts_as_loggable_options.fetch(:include_associated, true),
-      include_nested: @acts_as_loggable_options.fetch(:include_nested, true)
     }
 
     if name == 'User'
@@ -56,21 +54,16 @@ module ActsAsLoggable
 
   # Format the title of this attribute. Return nil to use the default attribute.titleize
   def log_changes_formatted_attribute(attribute)
-    if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
-      'Roles'
-    end
+    'Roles' if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
   end
 
   # Format the value of this attribute. Return nil to use the default to_s
   def log_changes_formatted_value(attribute, value)
-    if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
-      EffectiveRoles.roles_for(value)
-    end
+    EffectiveRoles.roles_for(value) if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
   end
 
   def log_changes_datatable
-    return nil unless persisted?
-    EffectiveLogChangesDatatable.new(changes_to_id: id, changes_to_type: self.class.name)
+    EffectiveLogChangesDatatable.new(changes_to_id: id, changes_to_type: self.class.name) if persisted?
   end
 
 end
