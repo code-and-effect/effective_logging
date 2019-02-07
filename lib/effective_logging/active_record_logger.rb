@@ -1,28 +1,32 @@
 module EffectiveLogging
   class ActiveRecordLogger
-    attr_accessor :object, :resource, :logger, :include_associated, :include_nested, :options, :to
+    attr_accessor :object, :resource, :options
 
     BLANK = "''"
     BLACKLIST = [:updated_at, :created_at, :encrypted_password, :status_steps] # Don't log changes or attributes
 
-    def initialize(object, include_associated: true, include_nested: true, to: nil)
-      raise ArgumentError.new('options must be a Hash') unless options.kind_of?(Hash)
-
+    def initialize(object, to: nil, include_associated: true, include_nested: true, prefix: nil, only: nil, except: nil, additionally: nil)
       @object = object
       @resource = Effective::Resource.new(object)
 
-      @logger = options.fetch(:logger, object)
-      @include_associated = options.fetch(:include_associated, true)
-      @include_nested = options.fetch(:include_nested, true)
-      @options = options
+      # Validate changes_to value
+      if to.present? && !(to.kind_of?(Symbol) && @resource.belong_tos.map(&:name).include?(to))
+        raise ArgumentError.new("unable to find existing belongs_to relationship matching #{to}. Expected a symbol matching a belongs_to.")
+      end
 
-      raise ArgumentError.new('logger must respond to logged_changes') unless @logger.respond_to?(:logged_changes)
+      @options = {
+        include_associated: include_associated,
+        include_nested: include_nested,
+        prefix: prefix,
+        only: only,
+        except: except,
+        additionally: additionally
+      }.compact
     end
 
     # Effective::Log.where(message: 'Deleted').where('details ILIKE ?', '%lab_test_id: 263%')
     def destroyed!
       log('Deleted', resource_attributes)
-      log_changes_to_parents('Deleted', resource_attributes)
     end
 
     def created!
@@ -42,27 +46,33 @@ module EffectiveLogging
     end
 
     def log(message, details)
-      logger.logged_changes.build(
+      Effective::Log.create!(
+        changes_to: log_changes_to,
+        associated: object,
+        associated_to_s: (object.to_s rescue nil),
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
-        message: [options[:prefix].presence, message].compact.join(' '),
-        associated_to_s: (logger.to_s rescue nil),
+        message: [options[:prefix].presence, message].compact.join,
         details: (details.presence || {})
-      ).tap { |log| log.save! }
-    end
-
-    def log_changes_to_parents(message, details)
-      log_changes_parents.each do |parent|
-        title = object.class.name.to_s.singularize.titleize
-        parent_options = { logger: parent, prefix: "#{title} - #{object} - " }
-        ActiveRecordLogger.new(parent, logger: parent).log(message, details)
-      end
+      )
     end
 
     private
 
+    def log_changes_to
+      logger = object
+
+      while(logger.log_changes_options[:to].present?)
+        belongs_to = logger.public_send(logger.log_changes_options[:to])
+        break unless belongs_to.respond_to?(:log_changes_options)
+        logger = belongs_to
+      end
+
+      logger
+    end
+
     def resource_attributes # effective_resources gem
-      applicable(resource.instance_attributes(include_associated: include_associated, include_nested: include_nested))
+      applicable(resource.instance_attributes(include_associated: options[:include_associated], include_nested: options[:include_nested]))
     end
 
     def resource_changes # effective_resources gem
@@ -101,29 +111,6 @@ module EffectiveLogging
 
       # Blacklist
       atts.except(*(BLACKLIST + BLACKLIST.map(&:to_s)))
-    end
-
-    # A parent is a belongs_to that accepts_nested_attributes for this resource
-    def log_changes_parents
-      resource.belong_tos.map do |association|
-        parent_klass = (association.options[:polymorphic] ? object.public_send(association.name).class : association.klass)
-
-        # Skip if the parent doesn't log_changes
-        next unless parent_klass.respond_to?(:log_changes)
-
-        # Skip unless the parent accepts_nested_attributes
-        next unless Effective::Resource.new(parent_klass).nested_resources.find { |ass| ass.plural_name == resource.plural_name }
-
-        parent = object.public_send(association.name).presence
-
-        # Sanity check
-        next unless parent.respond_to?(:log_changes_options)
-
-        # Skip if the parent does not log its nested or associated items
-        next unless parent.log_changes_options[:include_nested] || parent.log_changes_options[:include_associated]
-
-        parent
-      end.compact
     end
 
   end

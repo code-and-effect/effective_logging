@@ -9,7 +9,7 @@ module ActsAsLoggable
         raise ArgumentError.new('invalid arguments passed to (effective_logging) log_changes. Example usage: log_changes except: [:created_at]')
       end
 
-      if (unknown = (@acts_as_loggable_options.keys - [:only, :except, :additionally, :include_associated, :include_nested])).present?
+      if (unknown = (@acts_as_loggable_options.keys - [:to, :only, :except, :additionally, :include_associated, :include_nested])).present?
         raise ArgumentError.new("unknown keyword: #{unknown.join(', ')}")
       end
 
@@ -18,9 +18,10 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :associated, class_name: 'Effective::Log'
+    has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :changes_to, class_name: 'Effective::Log'
 
     log_changes_options = {
+      to: @acts_as_loggable_options[:to],
       only: Array(@acts_as_loggable_options[:only]).map { |attribute| attribute.to_s },
       except: Array(@acts_as_loggable_options[:except]).map { |attribute| attribute.to_s },
       additionally: Array(@acts_as_loggable_options[:additionally]).map { |attribute| attribute.to_s },
@@ -69,7 +70,7 @@ module ActsAsLoggable
 
   def log_changes_datatable
     return nil unless persisted?
-    EffectiveLogChangesDatatable.new(associated_id: id, associated_type: self.class.name)
+    EffectiveLogChangesDatatable.new(changes_to_id: id, changes_to_type: self.class.name)
   end
 
 end
