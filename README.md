@@ -339,6 +339,26 @@ EffectiveLogsDatatable.new(for: @user.id)
 EffectiveLogsDatatable.new(for: [1, 2, 3])  # Users with ID 1, 2 and 3
 ```
 
+### Upgrade from 2.0
+
+The database has changed slightly in 3.x
+
+```ruby
+rails generate migration upgrade_effective_logging
+```
+
+and then:
+
+```ruby
+change_column :logs, :message, :text # Was string
+
+add_column :logs, :changes_to_type, :string
+add_column :logs, :changes_to_id, :integer
+
+ActiveRecord::Base.connection.execute('UPDATE logs SET changes_to_type = associated_type;')
+ActiveRecord::Base.connection.execute('UPDATE logs SET changes_to_id = associated_id;')
+```
+
 ## License
 
 MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
