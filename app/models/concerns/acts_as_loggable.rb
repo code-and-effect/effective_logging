@@ -54,12 +54,12 @@ module ActsAsLoggable
 
   # Format the title of this attribute. Return nil to use the default attribute.titleize
   def log_changes_formatted_attribute(attribute)
-    'Roles' if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
+    'Roles' if attribute == :roles_mask && defined?(EffectiveRoles) && respond_to?(:roles)
   end
 
   # Format the value of this attribute. Return nil to use the default to_s
   def log_changes_formatted_value(attribute, value)
-    EffectiveRoles.roles_for(value) if attribute == 'roles_mask' && defined?(EffectiveRoles) && respond_to?(:roles)
+    EffectiveRoles.roles_for(value) if attribute == :roles_mask && defined?(EffectiveRoles) && respond_to?(:roles)
   end
 
   def log_changes_datatable
