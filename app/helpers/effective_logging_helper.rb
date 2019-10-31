@@ -1,4 +1,13 @@
 module EffectiveLoggingHelper
+  ALLOWED_TAGS = [
+    "a", "abbr", "acronym", "address", "b", "big", "blockquote", "br", "cite", "code", "dd", "del", "dfn", "div", "dl", "dt", "em",
+    "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i", "img", "ins", "kbd", "li", "ol", "p", "pre", "samp", "small", "span", "strong",
+    "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "tt", "ul", "var"
+  ]
+
+  ALLOWED_ATTRIBUTES = [
+    "abbr", "alt", "cite", "class", "colspan", "datetime", "height", "href", "name", "rowspan", "src", "title", "width", "xml:lang"
+  ]
 
   def bootstrap_class_for_status(status)
     case status
@@ -59,10 +68,7 @@ module EffectiveLoggingHelper
   end
 
   def format_log_details_resource_value(value)
-    @format_resource_tags ||= ActionView::Base.sanitized_allowed_tags.to_a + ['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']
-    @format_resource_atts ||= ActionView::Base.sanitized_allowed_attributes.to_a + ['colspan', 'rowspan']
-
-    simple_format(sanitize(value.to_s, tags: @format_resource_tags, attributes: @format_resource_atts), {}, sanitize: false)
+    simple_format(sanitize(value.to_s, tags: ALLOWED_TAGS, attributes: ALLOWED_ATTRIBUTES), {}, sanitize: false)
   end
 
 end
