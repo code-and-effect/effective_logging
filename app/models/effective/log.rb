@@ -11,10 +11,9 @@ module Effective
     belongs_to :parent, class_name: 'Effective::Log', counter_cache: true, optional: true
     has_many :logs, class_name: 'Effective::Log', foreign_key: :parent_id
 
-    belongs_to :user
-
+    belongs_to :user, optional: true
     belongs_to :changes_to, polymorphic: true, optional: true # This is the log_changes to: option
-    belongs_to :associated, polymorphic: true
+    belongs_to :associated, polymorphic: true, optional: true
 
     serialize :details, Hash
 
