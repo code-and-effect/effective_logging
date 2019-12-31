@@ -8,12 +8,12 @@ module Effective
     attr_accessor :prev_log
 
     # Self-Referencing relationship
-    belongs_to :parent, class_name: 'Effective::Log', counter_cache: true
+    belongs_to :parent, class_name: 'Effective::Log', counter_cache: true, optional: true
     has_many :logs, class_name: 'Effective::Log', foreign_key: :parent_id
 
     belongs_to :user
 
-    belongs_to :changes_to, polymorphic: true # This is the log_changes to: option
+    belongs_to :changes_to, polymorphic: true, optional: true # This is the log_changes to: option
     belongs_to :associated, polymorphic: true
 
     serialize :details, Hash
