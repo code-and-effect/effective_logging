@@ -1,7 +1,7 @@
 module ActsAsLoggable
   extend ActiveSupport::Concern
 
-  module ActiveRecord
+  module Base
     def log_changes(*options)
       @acts_as_loggable_options = options.try(:first) || {}
 

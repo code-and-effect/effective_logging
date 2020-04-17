@@ -22,7 +22,7 @@ module EffectiveLogging
     # Include acts_as_loggable concern and allow any ActiveRecord object to call it with log_changes()
     initializer 'effective_logging.active_record' do |app|
       ActiveSupport.on_load :active_record do
-        ActiveRecord::Base.extend(ActsAsLoggable::ActiveRecord)
+        ActiveRecord::Base.extend(ActsAsLoggable::Base)
       end
     end
 
