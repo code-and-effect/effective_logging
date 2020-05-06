@@ -43,6 +43,10 @@ module Effective
       "Log #{id}"
     end
 
+    def associated_to_s=(value)
+      super(value.to_s[0...255].presence) # Take only first 255 characters
+    end
+
     def log(message, status = EffectiveLogging.statuses.first, options = {})
       EffectiveLogger.log(message, status, (options || {}).merge(parent: self))
     end
