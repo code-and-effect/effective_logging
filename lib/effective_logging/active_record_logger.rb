@@ -5,16 +5,17 @@ module EffectiveLogging
     BLANK = "''"
     BLACKLIST = [:updated_at, :created_at, :encrypted_password, :status_steps] # Don't log changes or attributes
 
-    def initialize(object, to: nil, prefix: nil, only: nil, except: nil)
+    # to, prefix, only, except
+    def initialize(object, args = {})
       @object = object
       @resource = Effective::Resource.new(object)
 
       # Validate changes_to value
-      if to.present? && !@resource.belong_tos.map(&:name).include?(to)
-        raise ArgumentError.new("unable to find existing belongs_to relationship matching #{to}. Expected a symbol matching a belongs_to.")
+      if args[:to].present? && !@resource.belong_tos.map(&:name).include?(args[:to])
+        raise ArgumentError.new("unable to find existing belongs_to relationship matching #{args[:to]}. Expected a symbol matching a belongs_to.")
       end
 
-      @options = { to: to, prefix: prefix, only: only, except: Array(except) + BLACKLIST }.compact
+      @options = { to: args[:to], prefix: args[:prefix], only: args[:only], except: Array(args[:except]) + BLACKLIST }.compact
     end
 
     # Effective::Log.where(message: 'Deleted').where('details ILIKE ?', '%lab_test_id: 263%')
