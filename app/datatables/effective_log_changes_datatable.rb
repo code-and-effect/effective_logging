@@ -21,7 +21,8 @@ class EffectiveLogChangesDatatable < Effective::Datatable
       end
 
     end.search do |collection, term, column, sql_column|
-      collection.where("associated_type #{resource.ilike} ? OR associated_to_s #{resource.ilike} ? OR message #{resource.ilike} ?", "%#{term}%", "%#{term}%", "%#{term}%")
+      ilike = effective_resource.ilike
+      collection.where("associated_type #{ilike} ? OR associated_to_s #{ilike} ? OR message #{ilike} ?", "%#{term}%", "%#{term}%", "%#{term}%")
     end
 
     col :details, visible: false, sort: false do |log|
