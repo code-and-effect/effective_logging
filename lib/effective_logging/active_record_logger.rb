@@ -71,7 +71,7 @@ module EffectiveLogging
 
     def resource_changes # effective_resources gem
       resource.instance_changes(only: options[:only], except: options[:except]).inject({}) do |h, (attribute, (before, after))|
-        if object.respond_to?(:log_changes_formatted_value)
+        if object.respond_to?(:log_changes_formatted_value, true)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after
         end
@@ -79,7 +79,7 @@ module EffectiveLogging
         before = before.to_s if before.kind_of?(ActiveRecord::Base) || before.kind_of?(FalseClass)
         after = after.to_s if after.kind_of?(ActiveRecord::Base) || after.kind_of?(FalseClass)
 
-        attribute = if object.respond_to?(:log_changes_formatted_attribute)
+        attribute = if object.respond_to?(:log_changes_formatted_attribute, true)
           object.log_changes_formatted_attribute(attribute)
         end || attribute.to_s.titleize
 
