@@ -257,6 +257,17 @@ def log_changes_formatted_value(attribute, value)
 end
 ```
 
+Fully customize your log by creating a public instance method on the resource:
+```ruby
+# Format the log 
+def log_changes_formatted_log(default_message, details)
+  {
+    associated_to_s: "My #{self.class} label",
+    message: "Changed from #{details[:changes].first} to #{details[:changes].last}"
+  }
+end
+```
+
 ### Logging From JavaScript
 
 First, require the javascript in your application.js:

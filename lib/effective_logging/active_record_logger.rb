@@ -40,7 +40,7 @@ module EffectiveLogging
     end
 
     def log(message, details)
-      Effective::Log.create!(
+      log_options = {
         changes_to: log_changes_to,
         associated: object,
         associated_to_s: (object.to_s rescue nil),
@@ -48,7 +48,14 @@ module EffectiveLogging
         status: EffectiveLogging.log_changes_status,
         message: [options[:prefix].presence, message].compact.join,
         details: (details.presence || {})
-      )
+      }
+
+      if object.respond_to?(:log_changes_formatted_log)
+        formatted_log = object.log_changes_formatted_log(message, details)
+        log_options.merge!(formatted_log)
+      end
+
+      Effective::Log.create!(log_options)
     end
 
     private
