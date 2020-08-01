@@ -32,7 +32,7 @@ module EffectiveLogging
 
       return true if changes.blank? # If you just click save and change nothing, don't log it.
 
-      message = (['Updated'] + changes.map do |attribute, (before, after)|
+      message = (['Updated'] + format_resource_changes(changes).map do |attribute, (before, after)|
         "#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}"
       end).join("\n")
 
@@ -40,6 +40,8 @@ module EffectiveLogging
     end
 
     def log(message, details)
+      return if object.respond_to?(:log_changes_rule) && !object.log_changes_rule(details)
+
       log_options = {
         changes_to: log_changes_to,
         associated: object,
@@ -52,7 +54,7 @@ module EffectiveLogging
 
       if object.respond_to?(:log_changes_formatted_log)
         formatted_log = object.log_changes_formatted_log(message, details)
-        log_options.merge!(formatted_log)
+        log_options.merge!(formatted_log) if formatted_log
       end
 
       Effective::Log.create!(log_options)
@@ -77,7 +79,11 @@ module EffectiveLogging
     end
 
     def resource_changes # effective_resources gem
-      resource.instance_changes(only: options[:only], except: options[:except]).inject({}) do |h, (attribute, (before, after))|
+      resource.instance_changes(only: options[:only], except: options[:except])
+    end
+
+    def format_resource_changes(changes)
+      changes.inject({}) do |h, (attribute, (before, after))|
         if object.respond_to?(:log_changes_formatted_value)
           before = object.log_changes_formatted_value(attribute, before) || before
           after = object.log_changes_formatted_value(attribute, after) || after

@@ -257,14 +257,24 @@ def log_changes_formatted_value(attribute, value)
 end
 ```
 
-Fully customize your log by creating a public instance method on the resource:
+Alternatively, fully customize your log by creating a public instance method on the resource:
 ```ruby
 # Format the log 
 def log_changes_formatted_log(default_message, details)
   {
     associated_to_s: "My #{self.class} label",
-    message: "Changed from #{details[:changes].first} to #{details[:changes].last}"
+    message: "Changed " + details[:changes].map { |attribute, changes| "#{attribute.to_s.titlecase} from #{changes.first} to #{changes.last}" }.join(', ')
   }
+end
+```
+
+In addition to custom formatting, specific resource records can be skipped programmatically by creating an instance method on the resource:
+```ruby
+# Ignore records if that its resource has a cost and the cost is zero
+def log_changes_rule(details)
+  cost = details[:attributes][:cost]
+
+  cost.nil? || cost > 0
 end
 ```
 
