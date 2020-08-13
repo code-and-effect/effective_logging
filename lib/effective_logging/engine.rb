@@ -1,10 +1,12 @@
 require 'effective_logging/active_record_logger'
+require 'effective_logging/email_logger'
+require 'effective_logging/log_page_views'
+require 'effective_logging/set_current_user'
+require 'effective_logging/user_logger'
 
 module EffectiveLogging
   class Engine < ::Rails::Engine
     engine_name 'effective_logging'
-
-    config.autoload_paths += Dir["#{config.root}/lib/"]
 
     # Set up our default configuration options.
     initializer "effective_logging.defaults", :before => :load_config_initializers do |app|
@@ -14,7 +16,6 @@ module EffectiveLogging
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.email_enabled == true
-        require 'effective_logging/email_logger'
         ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
       end
     end
@@ -30,7 +31,6 @@ module EffectiveLogging
     initializer 'effective_logging.log_changes_action_controller' do |app|
       Rails.application.config.to_prepare do
         ActiveSupport.on_load :action_controller do
-          require 'effective_logging/set_current_user'
           ActionController::Base.include(EffectiveLogging::SetCurrentUser::ActionController)
         end
       end
