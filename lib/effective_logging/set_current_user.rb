@@ -7,9 +7,9 @@ module EffectiveLogging
 
       def set_effective_logging_current_user
         EffectiveLogging.current_user = current_user
+        yield if block_given?
       end
 
     end
   end
 end
-

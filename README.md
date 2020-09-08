@@ -197,6 +197,12 @@ This logging includes the resource's base attributes, all autosaved associations
 
 It will recurse through all accepts_nested_attributes has_many's and handle any number of child objects.
 
+Add to your application controller:
+
+```
+around_action :set_effective_logging_current_user
+```
+
 Add to your model:
 
 ```ruby
@@ -371,4 +377,3 @@ MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Bonus points for test coverage
 6. Create new Pull Request
-
