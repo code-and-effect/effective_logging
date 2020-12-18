@@ -3,11 +3,15 @@ module EffectiveLogging
     module ActionController
 
       # Add me to your ApplicationController
-      # before_action :set_effective_logging_current_user
+      # around_action :set_effective_logging_current_user
 
       def set_effective_logging_current_user
         EffectiveLogging.current_user = current_user
-        yield if block_given?
+
+        if block_given?
+          yield
+          EffectiveLogging.current_user = nil
+        end
       end
 
     end
