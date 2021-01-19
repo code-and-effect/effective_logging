@@ -40,7 +40,7 @@
       - next unless value.present?
       .row
         .col-md-12
-          %p
+          .mt-3
             %strong= "#{key.to_s.titleize}:"
           = format_log_details_value(log, key)
 
@@ -50,4 +50,3 @@
 
       - unless log.datatable.nil?
         = render_datatable(log.datatable)
-
