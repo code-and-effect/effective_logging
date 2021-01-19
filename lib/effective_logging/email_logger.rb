@@ -33,7 +33,7 @@ module EffectiveLogging
       end
 
       if to.blank? && (message.cc.present? || message.bcc.present?)
-        ::EffectiveLogger.email("#{message.subject} - multiple bcc senders", logged_fields)
+        ::EffectiveLogger.email("#{message.subject} - multiple recipients", logged_fields)
       end
 
     end
