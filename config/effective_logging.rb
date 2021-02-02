@@ -40,6 +40,9 @@ EffectiveLogging.setup do |config|
   #### Automatic Logging Functionality ####
   #########################################
 
+  # Log all active storage downloads
+  config.active_storage_enabled = true
+
   # Log all sent emails
   config.email_enabled = true
 

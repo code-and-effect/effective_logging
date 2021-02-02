@@ -1,4 +1,5 @@
 require 'effective_logging/active_record_logger'
+require 'effective_logging/active_storage_logger'
 require 'effective_logging/email_logger'
 require 'effective_logging/log_page_views'
 require 'effective_logging/set_current_user'
@@ -24,6 +25,16 @@ module EffectiveLogging
     initializer 'effective_logging.active_record' do |app|
       ActiveSupport.on_load :active_record do
         ActiveRecord::Base.extend(ActsAsLoggable::Base)
+      end
+    end
+
+    # Log all ActiveStorage downloads
+    initializer 'effective_logging.active_storage' do |app|
+      if EffectiveLogging.active_storage_enabled == true && defined?(ActiveStorage)
+        Rails.application.config.to_prepare do
+          ActiveStorage::DiskController.include(EffectiveLogging::ActiveStorageLogger)
+          ActiveStorage::DiskController.class_eval { after_action(:track_downloads, only: :show) }
+        end
       end
     end
 

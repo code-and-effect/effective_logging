@@ -11,6 +11,7 @@ module EffectiveLogging
   mattr_accessor :layout
   mattr_accessor :additional_statuses
 
+  mattr_accessor :active_storage_enabled
   mattr_accessor :email_enabled
   mattr_accessor :sign_in_enabled
   mattr_accessor :sign_out_enabled
@@ -48,8 +49,21 @@ module EffectiveLogging
 
   def self.statuses
     @statuses ||= (
-      Array(@@additional_statuses).map { |status| status.to_s.downcase } |  # union
-      ['info', 'success', 'error', 'view', log_changes_status, ('email' if email_enabled), ('sign_in' if sign_in_enabled), ('sign_out' if sign_out_enabled)].compact
+      base = [
+        'info',
+        'success',
+        'error',
+        'view',
+        log_changes_status, # 'change'
+        ('download' if active_storage_enabled),
+        ('email' if email_enabled),
+        ('sign_in' if sign_in_enabled),
+        ('sign_out' if sign_out_enabled)
+      ].compact
+
+      additional = Array(@@additional_statuses).map { |status| status.to_s.downcase }
+
+      base | additional # union
     )
   end
 
