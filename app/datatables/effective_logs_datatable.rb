@@ -7,10 +7,8 @@ class EffectiveLogsDatatable < Effective::Datatable
 
     if attributes[:user] == false
       # Do not include
-    elsif attributes[:for]
-      col :user, search: :string
     else
-      col :user
+      col :user, search: :string
     end
 
     unless attributes[:status] == false

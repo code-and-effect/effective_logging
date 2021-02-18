@@ -3,6 +3,7 @@ class CreateEffectiveLogging < ActiveRecord::Migration[4.2]
     create_table <%= @logs_table_name %> do |t|
       t.integer       :parent_id
 
+      t.string        :user_type
       t.integer       :user_id
 
       t.string        :changes_to_type

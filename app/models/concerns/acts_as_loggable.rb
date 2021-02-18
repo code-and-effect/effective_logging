@@ -27,8 +27,8 @@ module ActsAsLoggable
       except: Array(@acts_as_loggable_options[:except])
     }
 
-    if name == 'User'
-      log_changes_options[:except] += %i(sign_in_count current_sign_in_at current_sign_in_ip last_sign_in_at last_sign_in_ip encrypted_password remember_created_at reset_password_token invitation_sent_at invitation_created_at invitation_token)
+    if name.end_with?('User')
+      log_changes_options[:except] += %i(sign_in_count current_sign_in_at current_sign_in_ip last_sign_in_at last_sign_in_ip encrypted_password remember_created_at reset_password_token invitation_sent_at invitation_created_at invitation_token access_token refresh_token token_expires_at)
     end
 
     self.send(:define_method, :log_changes_options) { log_changes_options }
@@ -67,4 +67,3 @@ module ActsAsLoggable
   end
 
 end
-

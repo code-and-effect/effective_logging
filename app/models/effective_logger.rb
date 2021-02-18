@@ -6,7 +6,7 @@ class EffectiveLogger
 
     options = Hash(options).delete_if { |k, v| v.blank? }
 
-    if options[:user].present? && !options[:user].kind_of?(User)
+    if options[:user].present? && !options[:user].class.name.end_with?('User')
       raise ArgumentError.new('Log.log :user => ... argument must be a User object')
     end
 
@@ -30,6 +30,7 @@ class EffectiveLogger
       message: message,
       status: status,
       user_id: options.delete(:user_id),
+      user_type: options.delete(:user_type),
       user: options.delete(:user),
       parent: options.delete(:parent),
       associated: options.delete(:associated),

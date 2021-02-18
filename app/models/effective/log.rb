@@ -11,33 +11,36 @@ module Effective
     belongs_to :parent, class_name: 'Effective::Log', counter_cache: true, optional: true
     has_many :logs, class_name: 'Effective::Log', foreign_key: :parent_id
 
-    belongs_to :user, optional: true
+    belongs_to :user, polymorphic: true, optional: true
     belongs_to :changes_to, polymorphic: true, optional: true # This is the log_changes to: option
     belongs_to :associated, polymorphic: true, optional: true
 
+    effective_resource do
+      logs_count          :integer  # Rails Counter Cache
+
+      changes_to_type     :string
+      changes_to_id       :string
+
+      associated_type     :string
+      associated_id       :integer
+      associated_to_s     :string
+
+      status              :string
+      message             :text
+      details             :text
+
+      timestamps
+    end
+
     serialize :details, Hash
-
-    # Attributes
-    # logs_count          :integer  # Rails Counter Cache
-
-    # changes_to_type     :string
-    # changes_to_id       :string
-
-    # associated_type     :string
-    # associated_id       :integer
-    # associated_to_s     :string
-    # message             :text
-    # details             :text
-    # status              :string
-    # timestamps
 
     validates :message, presence: true
     validates :status, presence: true, inclusion: { in: EffectiveLogging.statuses }
 
     scope :deep, -> { includes(:user, :associated) }
     scope :sorted, -> { order(:id) }
-    scope :logged_changes, -> { where(status: EffectiveLogging.log_changes_status)}
-    scope :changes, -> { where(status: EffectiveLogging.log_changes_status)}
+    scope :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }
+    scope :changes, -> { where(status: EffectiveLogging.log_changes_status) }
 
     def to_s
       "Log #{id}"
@@ -63,5 +66,3 @@ module Effective
 
   end
 end
-
-

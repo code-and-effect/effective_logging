@@ -14,14 +14,6 @@ module EffectiveLogging
 
   include EffectiveGem
 
-  def self.supressed(&block)
-    @@supressed = true; yield; @@supressed = false
-  end
-
-  def self.supressed?
-    @@supressed == true
-  end
-
   def self.statuses
     @statuses ||= (
       base = [
@@ -53,6 +45,16 @@ module EffectiveLogging
 
   def self.current_user
     Thread.current[:effective_logging_current_user]
+  end
+
+  def self.supressed(&block)
+    Thread.current[:effective_logging_supressed] = true
+    yield
+    Thread.current[:effective_logging_supressed] = nil
+  end
+
+  def self.supressed?
+    Thread.current[:effective_logging_supressed] == true
   end
 
 end

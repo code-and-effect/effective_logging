@@ -39,7 +39,7 @@ module EffectiveLogging
         return if @_effective_logging_skip_log_page_view == true
         return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.parent)
 
-        user = EffectiveLogging.current_user || current_user
+        user = EffectiveLogging.current_user || (current_user if respond_to?(:current_user))
 
         if self.class.log_page_views_opts[:details] == false
           ::EffectiveLogger.view("#{request.request_method} #{request.path}", user: user)
@@ -66,4 +66,3 @@ module EffectiveLogging
 
   end
 end
-

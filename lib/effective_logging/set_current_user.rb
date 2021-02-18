@@ -9,8 +9,9 @@ module EffectiveLogging
         EffectiveLogging.current_user = current_user
 
         if block_given?
-          yield
+          retval = yield
           EffectiveLogging.current_user = nil
+          retval
         end
       end
 

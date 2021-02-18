@@ -18,7 +18,7 @@ module Admin
 
     def show
       @log = Effective::Log.includes(:logs).find(params[:id])
-      EffectiveLogging.authorize!(self, :show, @log)
+      EffectiveResources.authorize!(self, :show, @log)
 
       @log.next_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id > ?', @log.id).first
       @log.prev_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id < ?', @log.id).last
