@@ -1,11 +1,17 @@
 module Effective
   class LogsController < ApplicationController
+    before_action(:authenticate_user!, only: [:index, :show]) if defined?(Devise)
+
+    include Effective::CrudController
     skip_log_page_views
-    before_action :authenticate_user!, only: [:index, :show]
+
+    if (config = EffectiveLogging.layout)
+      layout(config.kind_of?(Hash) ? config[:application] : config)
+    end
 
     # This is a post from our Javascript
     def create
-      EffectiveLogging.authorize!(self, :create, Effective::Log.new)
+      EffectiveResources.authorize!(self, :create, Effective::Log.new)
 
       @log = Effective::Log.new.tap do |log|
         log.message = log_params[:message]
@@ -34,7 +40,7 @@ module Effective
 
     # This is the User index event
     def index
-      EffectiveLogging.authorize!(self, :index, Effective::Log.new(user_id: current_user.id))
+      EffectiveResources.authorize!(self, :index, Effective::Log.new(user_id: current_user.id))
 
       @datatable = EffectiveLogsDatatable.new(self, user_id: current_user.id)
     end

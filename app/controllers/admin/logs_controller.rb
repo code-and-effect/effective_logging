@@ -1,21 +1,25 @@
 module Admin
   class LogsController < ApplicationController
-    before_action :authenticate_user!
+    before_action(:authenticate_user!) if defined?(Devise)
+    before_action { EffectiveResources.authorize!(self, :admin, :effective_logging) }
+
+    include Effective::CrudController
     skip_log_page_views
 
-    layout (EffectiveLogging.layout.kind_of?(Hash) ? EffectiveLogging.layout[:admin_logs] : EffectiveLogging.layout)
+    if (config = EffectiveLogging.layout)
+      layout(config.kind_of?(Hash) ? config[:admin] : config)
+    end
 
     def index
+      EffectiveResources.authorize!(self, :index, Effective::Log)
       @datatable = EffectiveLogsDatatable.new(self)
-
       @page_title = 'Logs'
-
-      EffectiveLogging.authorize!(self, :index, Effective::Log)
-      EffectiveLogging.authorize!(self, :admin, :effective_logging)
     end
 
     def show
       @log = Effective::Log.includes(:logs).find(params[:id])
+      EffectiveLogging.authorize!(self, :show, @log)
+
       @log.next_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id > ?', @log.id).first
       @log.prev_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id < ?', @log.id).last
 
@@ -25,8 +29,6 @@ module Admin
         @log.datatable = EffectiveLogsDatatable.new(self, log_id: @log.id)
       end
 
-      EffectiveLogging.authorize!(self, :show, @log)
-      EffectiveLogging.authorize!(self, :admin, :effective_logging)
     end
   end
 end

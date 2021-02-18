@@ -3,41 +3,16 @@ require 'effective_logging/engine'
 require 'effective_logging/version'
 
 module EffectiveLogging
-
-  # The following are all valid config keys
-  mattr_accessor :logs_table_name
-
-  mattr_accessor :authorization_method
-  mattr_accessor :layout
-  mattr_accessor :additional_statuses
-
-  mattr_accessor :active_storage_enabled
-  mattr_accessor :email_enabled
-  mattr_accessor :sign_in_enabled
-  mattr_accessor :sign_out_enabled
-
   mattr_accessor :supressed
 
-  def self.setup
-    yield self
+  def self.config_keys
+    [
+      :logs_table_name, :layout, :additional_statuses,
+      :active_storage_enabled, :email_enabled, :sign_in_enabled, :sign_out_enabled
+    ]
   end
 
-  def self.authorized?(controller, action, resource)
-    @_exceptions ||= [Effective::AccessDenied, (CanCan::AccessDenied if defined?(CanCan)), (Pundit::NotAuthorizedError if defined?(Pundit))].compact
-
-    return !!authorization_method unless authorization_method.respond_to?(:call)
-    controller = controller.controller if controller.respond_to?(:controller)
-
-    begin
-      !!(controller || self).instance_exec((controller || self), action, resource, &authorization_method)
-    rescue *@_exceptions
-      false
-    end
-  end
-
-  def self.authorize!(controller, action, resource)
-    raise Effective::AccessDenied unless authorized?(controller, action, resource)
-  end
+  include EffectiveGem
 
   def self.supressed(&block)
     @@supressed = true; yield; @@supressed = false
@@ -61,7 +36,7 @@ module EffectiveLogging
         ('sign_out' if sign_out_enabled)
       ].compact
 
-      additional = Array(@@additional_statuses).map { |status| status.to_s.downcase }
+      additional = Array(additional_statuses).map { |status| status.to_s.downcase }
 
       base | additional # union
     )
@@ -73,11 +48,11 @@ module EffectiveLogging
 
   # This is set by the "set_effective_logging_current_user" before_filter.
   def self.current_user=(user)
-    @effective_logging_current_user = user
+    Thread.current[:effective_logging_current_user] = user
   end
 
   def self.current_user
-    @effective_logging_current_user
+    Thread.current[:effective_logging_current_user]
   end
 
 end
