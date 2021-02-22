@@ -10,11 +10,5 @@ module Admin
       layout(config.kind_of?(Hash) ? config[:admin] : config)
     end
 
-    def index
-      EffectiveResources.authorize!(self, :index, Effective::Log)
-      @datatable = EffectiveLogsDatatable.new(self)
-      @page_title = 'Logs'
-    end
-
   end
 end
