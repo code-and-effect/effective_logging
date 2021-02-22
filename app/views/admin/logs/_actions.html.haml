@@ -1,8 +1,0 @@
-- show_path = (datatable.admin_namespace? ? effective_logging.admin_log_path(log) : effective_logging.log_path(log))
-
-- if defined?(EffectiveBootstrap)
-  = dropdown(variation: :dropleft) do
-    = dropdown_link_to 'View', show_path
-- else
-  = link_to show_path, title: 'View' do
-    %span.glyphicon.glyphicon-eye-open

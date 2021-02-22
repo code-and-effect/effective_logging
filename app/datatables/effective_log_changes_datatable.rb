@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EffectiveLogChangesDatatable < Effective::Datatable
   datatable do
     order :updated_at
@@ -5,19 +7,19 @@ class EffectiveLogChangesDatatable < Effective::Datatable
     col :updated_at, label: 'Date'
     col :id, visible: false
 
-    col :user, sort: false
+    col :user, search: :string, sort: false
 
     col :associated_type, visible: false
-    col :associated_id, visible: false
-    col :associated_to_s, visible: false
+    col :associated_id, visible: false, label: 'Associated Id'
+    col :associated_to_s, visible: false, label: 'Associated'
 
     col :message, sort: false do |log|
-      message = log.message.gsub("\n", '<br>')
+      (log.message || '').gsub!("\n", '<br>')
 
       if log.associated_id == attributes[:changes_to_id] && log.associated_type == attributes[:changes_to_type]
-        message
+        log.message
       else
-        "#{log.associated_type} #{log.associated_to_s} - #{message}"
+        "#{log.associated_type} #{log.associated_to_s} - #{log.message}"
       end
 
     end.search do |collection, term, column, sql_column|
@@ -29,9 +31,7 @@ class EffectiveLogChangesDatatable < Effective::Datatable
       tableize_hash(log.details)
     end
 
-    unless attributes[:actions] == false
-      actions_col partial: 'admin/logs/actions', partial_as: :log
-    end
+    actions_col
   end
 
   # A nil attributes[:log_id] means give me all the top level log entries

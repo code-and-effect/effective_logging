@@ -16,19 +16,5 @@ module Admin
       @page_title = 'Logs'
     end
 
-    def show
-      @log = Effective::Log.includes(:logs).find(params[:id])
-      EffectiveResources.authorize!(self, :show, @log)
-
-      @log.next_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id > ?', @log.id).first
-      @log.prev_log = Effective::Log.order(:id).where(parent_id: @log.parent_id).where('id < ?', @log.id).last
-
-      @page_title = "Log ##{@log.to_param}"
-
-      if @log.logs.present?
-        @log.datatable = EffectiveLogsDatatable.new(self, log_id: @log.id)
-      end
-
-    end
   end
 end

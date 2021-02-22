@@ -41,24 +41,7 @@ module Effective
     # This is the User index event
     def index
       EffectiveResources.authorize!(self, :index, Effective::Log.new(user_id: current_user.id))
-
       @datatable = EffectiveLogsDatatable.new(self, user_id: current_user.id)
-    end
-
-    # This is the User show event
-    def show
-      @log = Effective::Log.includes(:logs).find(params[:id])
-
-      EffectiveLogging.authorize!(self, :show, @log)
-
-      @log.next_log = Effective::Log.unscoped.order(:id).where(parent_id: @log.parent_id).where('id > ?', @log.id).first
-      @log.prev_log = Effective::Log.unscoped.order(:id).where(parent_id: @log.parent_id).where('id < ?', @log.id).last
-
-      @page_title = "Log ##{@log.to_param}"
-
-      if @log.logs.present?
-        @log.datatable = EffectiveLogsDatatable.new(self, log_id: @log.id)
-      end
     end
 
     def html_part

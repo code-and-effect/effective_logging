@@ -8,16 +8,16 @@ class EffectiveLogsDatatable < Effective::Datatable
     if attributes[:user] == false
       # Do not include
     else
-      col :user, search: :string
+      col :user, search: :string, sort: false
     end
 
     unless attributes[:status] == false
       col :status, search: { collection: EffectiveLogging.statuses }
     end
 
-    col :associated_type, search: { as: :string }
-    col :associated_id, search: { as: :integer }, visible: false, label: 'Associated Id'
-    col :associated_to_s, search: { as: :string }, label: 'Associated'
+    col :associated_type, visible: false
+    col :associated_id, visible: false, label: 'Associated Id'
+    col :associated_to_s, label: 'Associated'
 
     col :message do |log|
       log.message.gsub("\n", '<br>')
@@ -29,9 +29,7 @@ class EffectiveLogsDatatable < Effective::Datatable
       tableize_hash(log.details.except(:email))
     end
 
-    unless attributes[:actions] == false
-      actions_col partial: 'admin/logs/actions', partial_as: :log
-    end
+    actions_col
   end
 
   # A nil attributes[:log_id] means give me all the top level log entries

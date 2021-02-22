@@ -8,18 +8,22 @@
         %p= log.message.to_s.gsub("\n", '<br>').html_safe
 
       .col-md-4.text-right
-        - if log.prev_log
-          = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + log.prev_log.to_param), class: 'btn btn-primary'
+        - prev_log = log.prev_log
+        - next_log = log.next_log
 
-        - if log.next_log
-          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + log.next_log.to_param), class: 'btn btn-primary'
+        - if prev_log.present?
+          = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + prev_log.to_param), class: 'btn btn-primary'
+
+        - if next_log.present?
+          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + next_log.to_param), class: 'btn btn-primary'
 
   .panel-body.card-body
     .row
       .col-md-6
         %p
           - status_class = bootstrap_class_for_status(log.status)
-          %span{:class => (defined?(EffectiveBootstrap) ? "badge badge-#{status_class}" : "label label-#{status_class}")}= log.status
+          %span{class: (defined?(EffectiveBootstrap) ? "badge badge-#{status_class}" : "label label-#{status_class}")}= log.status
+
           = log.created_at.strftime("%F %H:%M:%S")
           = '(' + time_ago_in_words(log.created_at) + ' ago)'
 
@@ -28,7 +32,8 @@
           %p
             %strong User:
             = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
-        - if (log.associated.present? rescue false)
+
+        - if log.associated_id.present? && log.associated_type.present? && (log.associated.present? rescue false)
           %p
             %strong Associated:
             - if log.associated.to_s.starts_with?('#<')
@@ -47,6 +52,4 @@
     - if log.logs.present?
       %hr
       %p This log contains #{log.logs_count} additional sub entries:
-
-      - unless log.datatable.nil?
-        = render_datatable(log.datatable)
+      = render_datatable(log.child_logs_datatable)
