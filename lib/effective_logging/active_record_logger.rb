@@ -33,6 +33,9 @@ module EffectiveLogging
       return true if changes.blank? # If you just click save and change nothing, don't log it.
 
       message = (['Updated'] + changes.map do |attribute, (before, after)|
+        before = "HTML content (#{before.length})" if before.kind_of?(String) && before.include?('<div')
+        after = "HTML content (#{after.length})" if after.kind_of?(String) && after.include?('<div')
+
         "#{attribute}: #{before.presence || BLANK} &rarr; #{after.presence || BLANK}"
       end).join("\n")
 
