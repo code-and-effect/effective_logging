@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EffectiveLogging
   module ActiveStorageLogger
 
@@ -6,6 +8,7 @@ module EffectiveLogging
 
       key = decode_verified_key()
       return unless key.present?
+      return if (key[:content_type] || '').starts_with?('image')
 
       blob = ActiveStorage::Blob.where(key: key[:key]).first
       return unless blob.present?
