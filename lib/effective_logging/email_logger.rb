@@ -8,10 +8,19 @@ module EffectiveLogging
       fields = { from: message.from.join(','), to: message.to, subject: message.subject, cc: message.cc, bcc: message.bcc }
 
       # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
-      # mail(to: 'admin@example.com', subject: @post.title, log: { post: @post })
+      # mail(to: 'admin@example.com', subject: @post.title, log: @post)
+
       if message.header['log'].present?
-        # This is a bit sketchy, but gives access to the object in Rails 4.2 anyway
-        fields.merge!(message.header['log'].instance_variable_get(:@value) || {})
+        obj = message.header['log'].instance_variable_get(:@unparsed_value)
+        obj ||= message.header['log'].instance_variable_get(:@value)
+
+        if obj.kind_of?(ActiveRecord::Base)
+          fields.merge!(associated: obj)
+        elsif obj.kind_of?(Hash)
+          fields.merge!(obj)
+        else
+          raise('log expected an ActiveRecord object or Hash')
+        end
 
         # Get rid of the extra header, as it should not be set in the real mail message.
         message.header['log'] = nil
@@ -49,7 +58,7 @@ module EffectiveLogging
       tos.each do |to|
         user = (user_klass.where(email: to.downcase).first if user_klass.present?)
 
-        user_fields = fields.merge(to: to, user: user, associated: user)
+        user_fields = fields.merge(to: to, user: user)
         ::EffectiveLogger.email("#{message.subject} - #{tos.join(', ')}", user_fields)
       end
 
