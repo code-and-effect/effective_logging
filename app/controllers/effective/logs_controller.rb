@@ -47,7 +47,7 @@ module Effective
     def html_part
       @log = Effective::Log.find(params[:id])
 
-      EffectiveLogging.authorize!(self, :show, @log)
+      EffectiveResources.authorize!(self, :show, @log)
 
       value = @log.details[(params[:key] || '').to_sym].to_s
 
