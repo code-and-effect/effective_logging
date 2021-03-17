@@ -9,30 +9,30 @@ module EffectiveLogging
 
       # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
       # mail(to: 'admin@example.com', subject: @post.title, log: @post)
+      log = if message.header['log'].present?
+        value = message.header['log'].instance_variable_get(:@unparsed_value)
+        value ||= message.header['log'].instance_variable_get(:@value)
+        message.header['log'] = nil
+        value
+      end
 
-      if message.header['log'].present?
-        obj = message.header['log'].instance_variable_get(:@unparsed_value)
-        obj ||= message.header['log'].instance_variable_get(:@value)
-
-        if obj.kind_of?(ActiveRecord::Base)
-          fields.merge!(associated: obj)
-        elsif obj.kind_of?(Hash)
-          fields.merge!(obj)
+      if log.present?
+        if log.kind_of?(ActiveRecord::Base)
+          fields.merge!(associated: log)
+        elsif log.kind_of?(Hash)
+          fields.merge!(log)
         else
           raise('log expected an ActiveRecord object or Hash')
         end
-
-        # Get rid of the extra header, as it should not be set in the real mail message.
-        message.header['log'] = nil
       end
 
       # Pass a tenant to your mailer
       # mail(to: 'admin@example.com', subject: @post.title, tenant: Tenant.current)
-      tenant = if message.header['tenant'].present?
+      tenant = if message.header['tenant'].present? && defined?(Tenant)
         value = message.header['tenant'].to_s.to_sym # OptionalField, not a String here
         message.header['tenant'] = nil
         value
-      end || (Tenant.current if defined?(Tenant))
+      end
 
       user_klass = "#{tenant.to_s.classify}::User".safe_constantize
 
