@@ -28,7 +28,7 @@ module EffectiveLogging
 
       # Pass a tenant to your mailer
       # mail(to: 'admin@example.com', subject: @post.title, tenant: Tenant.current)
-      tenant = if message.header['tenant'].present? && defined?(Tenant)
+      tenant = if message.header['tenant'].present?
         value = message.header['tenant'].to_s.to_sym # OptionalField, not a String here
         message.header['tenant'] = nil
         value
@@ -41,7 +41,9 @@ module EffectiveLogging
 
       fields[:email] = "#{message.header}<hr>#{body}"
 
-      if tenant.present?
+      if defined?(Tenant) && Tenant.current.present?
+        log_email(message, fields, user_klass)
+      elsif defined?(Tenant) && tenant.present?
         Tenant.as(tenant) { log_email(message, fields, user_klass) }
       else
         log_email(message, fields, user_klass)
