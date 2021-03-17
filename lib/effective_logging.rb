@@ -3,8 +3,6 @@ require 'effective_logging/engine'
 require 'effective_logging/version'
 
 module EffectiveLogging
-  mattr_accessor :supressed
-
   def self.config_keys
     [
       :logs_table_name, :layout, :additional_statuses,
@@ -45,6 +43,11 @@ module EffectiveLogging
 
   def self.current_user
     Thread.current[:effective_logging_current_user]
+  end
+
+  # Used to supress all logging
+  def self.supressed=(value)
+    Thread.current[:effective_logging_supressed] = value
   end
 
   def self.supressed(&block)

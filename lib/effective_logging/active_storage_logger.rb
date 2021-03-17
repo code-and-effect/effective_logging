@@ -4,6 +4,8 @@ module EffectiveLogging
   module ActiveStorageLogger
 
     def track_downloads
+      return if EffectiveLogging.supressed?
+
       user = current_user if respond_to?(:current_user)
 
       key = decode_verified_key()
