@@ -41,10 +41,8 @@ module EffectiveLogging
 
       fields[:email] = "#{message.header}<hr>#{body}"
 
-      if defined?(Tenant) && Tenant.current.present?
-        log_email(message, fields, user_klass)
-      elsif defined?(Tenant) && tenant.present?
-        Tenant.as(tenant) { log_email(message, fields, user_klass) }
+      if tenant.present? && defined?(Tenant)
+        Tenant.as_if(tenant) { log_email(message, fields, user_klass) }
       else
         log_email(message, fields, user_klass)
       end
