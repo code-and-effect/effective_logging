@@ -36,8 +36,8 @@ module EffectiveLogging
 
       user_klass = "#{tenant.to_s.classify}::User".safe_constantize
 
-      body = (message.body.try(:parts) || []).find { |part| part.content_type.to_s.downcase.include?('text/html') }
-      body ||= message.body
+      parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
+      body = parts.find { |part| part.content_type.to_s.downcase.include?('text/html') } || message.body
 
       fields[:email] = "#{message.header}<hr>#{body}"
 
