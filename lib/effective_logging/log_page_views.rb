@@ -37,7 +37,7 @@ module EffectiveLogging
       def effective_logging_log_page_view
         return if EffectiveLogging.supressed?
         return if @_effective_logging_skip_log_page_view == true
-        return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.parent)
+        return if (self.class.log_page_views_opts[:skip_namespace] || []).include?(self.class.ancestors.first)
 
         user = EffectiveLogging.current_user || (current_user if respond_to?(:current_user))
 
