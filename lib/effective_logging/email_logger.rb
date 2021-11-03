@@ -34,17 +34,16 @@ module EffectiveLogging
         value
       end
 
-      user_klass = "#{tenant.to_s.classify}::User".safe_constantize
-
       parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
       body = parts.find { |part| part.content_type.to_s.downcase.include?('text/html') } || message.body
 
       fields[:email] = "#{message.header}<hr>#{body}"
 
       if tenant.present? && defined?(Tenant)
+        user_klass = (Tenant.engine_user(tenant) rescue nil)
         Tenant.as_if(tenant) { log_email(message, fields, user_klass) }
       else
-        log_email(message, fields, user_klass)
+        log_email(message, fields, 'User'.safe_constantize)
       end
 
       true
