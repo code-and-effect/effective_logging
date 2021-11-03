@@ -20,7 +20,7 @@ class EffectiveLogsDatatable < Effective::Datatable
     col :associated_to_s, label: 'Associated'
 
     col :message do |log|
-      (log.message || '').gsub!("\n", '<br>')
+      (log.message || '').gsub("\n", '<br>')
     end
 
     col :logs_count, visible: false
