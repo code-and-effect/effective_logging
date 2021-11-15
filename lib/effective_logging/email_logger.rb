@@ -29,7 +29,7 @@ module EffectiveLogging
       # Pass a tenant to your mailer
       # mail(to: 'admin@example.com', subject: @post.title, tenant: Tenant.current)
       tenant = if message.header['tenant'].present?
-        value = message.header['tenant'].to_s.to_sym # OptionalField, not a String here
+        value = Array(message.header['tenant']).first.to_s.to_sym # OptionalField, not a String here
         message.header['tenant'] = nil
         value
       end
