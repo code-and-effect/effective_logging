@@ -3,6 +3,7 @@ module EffectiveLogging
     def self.delivering_email(message)
       return if EffectiveLogging.supressed?
       return unless message.present?
+      return unless ActiveRecord::Base.connection.table_exists?(:logs)
 
       # collect a Hash of arguments used to invoke EffectiveLogger.success
       fields = { from: message.from.join(','), to: message.to, subject: message.subject, cc: message.cc, bcc: message.bcc }
