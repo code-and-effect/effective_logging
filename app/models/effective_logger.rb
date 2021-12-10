@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Call EffectiveLog.info or EffectiveLog.success  EffectiveLog.error
 
 class EffectiveLogger

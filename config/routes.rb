@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 EffectiveLogging::Engine.routes.draw do
   scope module: 'effective' do
     # Create is our javascript POST event for EffectiveLogging from JS side
