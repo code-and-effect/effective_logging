@@ -11,12 +11,11 @@ module EffectiveLogging
       # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
       # mail(to: 'admin@example.com', subject: @post.title, log: @post)
       log = if message.header['log'].present?
-        value = message.header['log'].instance_variable_get(:@unparsed_value)
-        value ||= message.header['log'].instance_variable_get(:@value)
-        message.header['log'] = nil
-        value
+        message.header['log'].instance_variable_get(:@unparsed_value) ||
+        message.header['log'].instance_variable_get(:@value)
       end
 
+      # If we have a logged object, associate it
       if log.present?
         if log.kind_of?(ActiveRecord::Base)
           fields.merge!(associated: log)
@@ -29,17 +28,21 @@ module EffectiveLogging
 
       # Read the current app's Tenant if defined
       tenant = if defined?(Tenant)
-        message.header['tenant'] = nil
         Tenant.current || raise("Missing tenant in effective_logging email logger")
       end
 
+      # Clean up the header
+      message.header.fields.delete_if { |field| ['tenant', 'log'].include?(field) }
+
+      # Parse the content for logging
       parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
       body = parts.find { |part| part.content_type.to_s.downcase.include?('text/html') } || message.body
-
       fields[:email] = "#{message.header}<hr>#{body}"
 
+      # Find the user to associate it with
       user_klass = (tenant ? Tenant.engine_user(tenant) : 'User'.safe_constantize)
 
+      # Log the email
       log_email(message, fields, user_klass)
 
       true
