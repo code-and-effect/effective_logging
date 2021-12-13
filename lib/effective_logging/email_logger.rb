@@ -6,7 +6,7 @@ module EffectiveLogging
       return unless ActiveRecord::Base.connection.table_exists?(:logs)
 
       # collect a Hash of arguments used to invoke EffectiveLogger.success
-      fields = { from: message.from.join(','), to: message.to, subject: message.subject, cc: message.cc, bcc: message.bcc }
+      fields = { from: Array(message.from).join(','), to: message.to, subject: message.subject, cc: message.cc, bcc: message.bcc }
 
       # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
       # mail(to: 'admin@example.com', subject: @post.title, log: @post)
@@ -27,12 +27,10 @@ module EffectiveLogging
         end
       end
 
-      # Pass a tenant to your mailer
-      # mail(to: 'admin@example.com', subject: @post.title, tenant: Tenant.current)
-      tenant = if message.header['tenant'].present?
-        value = Array(message.header['tenant']).first.to_s.to_sym # OptionalField, not a String here
+      # Read the current app's Tenant if defined
+      tenant = if defined?(Tenant)
         message.header['tenant'] = nil
-        value
+        Tenant.current || raise("Missing tenant in effective_logging email logger")
       end
 
       parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
@@ -40,12 +38,9 @@ module EffectiveLogging
 
       fields[:email] = "#{message.header}<hr>#{body}"
 
-      if tenant.present? && defined?(Tenant)
-        user_klass = (Tenant.engine_user(tenant) rescue nil)
-        Tenant.as_if(tenant) { log_email(message, fields, user_klass) }
-      else
-        log_email(message, fields, 'User'.safe_constantize)
-      end
+      user_klass = (tenant ? Tenant.engine_user(tenant) : 'User'.safe_constantize)
+
+      log_email(message, fields, user_klass)
 
       true
     end
@@ -65,6 +60,8 @@ module EffectiveLogging
       if tos.blank? && (message.cc.present? || message.bcc.present?)
         ::EffectiveLogger.email("#{message.subject} - multiple recipients", fields)
       end
+
+      true
     end
 
   end
