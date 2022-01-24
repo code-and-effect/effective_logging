@@ -32,7 +32,7 @@ module EffectiveLogging
       end
 
       # Clean up the header
-      message.header.fields.delete_if { |field| ['tenant', 'log'].include?(field) }
+      message.header.fields.delete_if { |field| ['tenant', 'log'].include?(field.name) }
 
       # Parse the content for logging
       parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
