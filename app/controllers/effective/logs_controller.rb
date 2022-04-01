@@ -41,7 +41,7 @@ module Effective
     # This is the User index event
     def index
       EffectiveResources.authorize!(self, :index, Effective::Log.new(user_id: current_user.id))
-      @datatable = EffectiveLogsDatatable.new(self, user_id: current_user.id)
+      @datatable = EffectiveLogsDatatable.new(self, for: current_user.id)
     end
 
     def html_part
