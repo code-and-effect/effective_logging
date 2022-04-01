@@ -17,7 +17,9 @@ module EffectiveLogging
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.email_enabled == true
-        ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
+        Rails.application.config.to_prepare do
+          ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
+        end
       end
     end
 
