@@ -17,7 +17,7 @@ module EffectiveLogging
     # Automatically Log Emails
     initializer 'effective_logging.emails' do |app|
       if EffectiveLogging.email_enabled == true
-        Rails.application.config.to_prepare do
+        app.config.to_prepare do
           ActionMailer::Base.register_interceptor(EffectiveLogging::EmailLogger)
         end
       end
@@ -25,15 +25,17 @@ module EffectiveLogging
 
     # Include acts_as_loggable concern and allow any ActiveRecord object to call it with log_changes()
     initializer 'effective_logging.active_record' do |app|
-      ActiveSupport.on_load :active_record do
-        ActiveRecord::Base.extend(ActsAsLoggable::Base)
+      app.config.to_prepare do
+        ActiveSupport.on_load :active_record do
+          ActiveRecord::Base.extend(ActsAsLoggable::Base)
+        end
       end
     end
 
     # Log all ActiveStorage downloads
     initializer 'effective_logging.active_storage' do |app|
       if EffectiveLogging.active_storage_enabled == true && defined?(ActiveStorage)
-        Rails.application.config.to_prepare do
+        app.config.to_prepare do
           ActiveStorage::DiskController.include(EffectiveLogging::ActiveStorageLogger)
           ActiveStorage::DiskController.class_eval { after_action(:track_downloads, only: :show) }
         end
@@ -42,7 +44,7 @@ module EffectiveLogging
 
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.log_changes_action_controller' do |app|
-      Rails.application.config.to_prepare do
+      app.config.to_prepare do
         ActiveSupport.on_load :action_controller do
           ActionController::Base.include(EffectiveLogging::SetCurrentUser::ActionController)
         end
@@ -51,8 +53,10 @@ module EffectiveLogging
 
     # Register the log_page_views concern so that it can be called in ActionController or elsewhere
     initializer 'effective_logging.action_controller' do |app|
-      ActiveSupport.on_load :action_controller do
-        ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
+      app.config.to_prepare do
+        ActiveSupport.on_load :action_controller do
+          ActionController::Base.extend(EffectiveLogging::LogPageViews::ActionController)
+        end
       end
     end
 
