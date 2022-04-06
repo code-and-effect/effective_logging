@@ -52,8 +52,9 @@ module EffectiveLogging
 
   def self.supressed(&block)
     Thread.current[:effective_logging_supressed] = true
-    yield
+    value = yield
     Thread.current[:effective_logging_supressed] = nil
+    value
   end
 
   def self.supressed?
