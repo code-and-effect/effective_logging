@@ -64,8 +64,12 @@ module ActsAsLoggable
     EffectiveRoles.roles_for(value) if attribute == :roles_mask && defined?(EffectiveRoles) && respond_to?(:roles)
   end
 
+  def logs_datatable
+    EffectiveLogsDatatable.new(for: self) if persisted?
+  end
+
   def log_changes_datatable
-    EffectiveLogChangesDatatable.new(changes_to_id: id, changes_to_type: self.class.name) if persisted?
+    EffectiveLogChangesDatatable.new(changes_to: self) if persisted?
   end
 
 end
