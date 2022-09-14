@@ -2,7 +2,7 @@
 
 class EffectiveLogChangesDatatable < Effective::Datatable
   datatable do
-    order :updated_at
+    order :id, :desc
 
     col :updated_at, label: 'Date'
     col :id, visible: false
@@ -14,12 +14,12 @@ class EffectiveLogChangesDatatable < Effective::Datatable
     col :associated_to_s, visible: false, label: 'Associated'
 
     col :message, sort: false do |log|
-      (log.message || '').gsub!("\n", '<br>')
+      message = (log.message || '').gsub("\n", '<br>')
 
       if log.associated_id == attributes[:changes_to_id] && log.associated_type == attributes[:changes_to_type]
-        log.message
+        message
       else
-        "#{log.associated_type} #{log.associated_to_s} - #{log.message}"
+        "#{log.associated_type} #{log.associated_to_s} - #{message}"
       end
 
     end.search do |collection, term, column, sql_column|
