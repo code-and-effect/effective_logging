@@ -48,7 +48,7 @@ class EffectiveLogsDatatable < Effective::Datatable
 
     # Newer syntax, pass by object
     if attributes[:for_id] && attributes[:for_type]
-      for_scope = scope.where(associated_id: attributes[:for_id], associated_type: attributes[:for_type])
+      scope = scope.where(associated_id: attributes[:for_id], associated_type: attributes[:for_type])
         .or(scope.where(changes_to_id: attributes[:for_id], changes_to_type: attributes[:for_type]))
         .or(scope.where(user_id: attributes[:for_id], user_type: attributes[:for_type]))
     end
