@@ -8,25 +8,29 @@ class EffectiveLogsDatatable < Effective::Datatable
     if attributes[:user] == false
       # Do not include
     else
-      col :user, search: :string, sort: false
+      col(:user, search: :string).search do |collection, term, column, sql_column|
+        klass = current_user.class
+        users = Effective::Resource.new(klass).search_any(term, columns: [:first_name, :middle_name, :last_name, :name, :email])
+        collection.where(user_type: klass.name, user_id: users)
+      end.sort do |collection, direction, column, sql_column|
+        collection.order(user_id: direction)
+      end
     end
 
     unless attributes[:status] == false
-      col :status, search: { collection: EffectiveLogging.statuses }
+      col :status, search: { collection: EffectiveLogging.statuses, fuzzy: false }
     end
 
-    col :changes_to_type, visible: false
-    col :changes_to_id, visible: false
+    col :changes_to_type, visible: false, sort: false
+    col :changes_to_id, visible: false, sort: false
 
-    col :associated_type, visible: false
-    col :associated_id, visible: false, label: 'Associated Id'
+    col :associated_type, visible: false, sort: false
+    col :associated_id, visible: false, label: 'Associated Id', sort: false
     col :associated_to_s, label: 'Associated'
 
-    col :message do |log|
+    col :message, sort: false do |log|
       (log.message || '').gsub("\n", '<br>')
     end
-
-    col :logs_count, visible: false
 
     col :details, visible: false, sort: false do |log|
       tableize_hash(log.details.except(:email))
