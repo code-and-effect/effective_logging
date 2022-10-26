@@ -38,7 +38,7 @@ class EffectiveLogsDatatable < Effective::Datatable
   # A nil attributes[:log_id] means give me all the top level log entries
   # If we set a log_id then it's for sub logs
   collection do
-    scope = Effective::Log.includes(:user).where(parent_id: attributes[:log_id])
+    scope = Effective::Log.deep.all
 
     # Older syntax, pass by integer
     if attributes[:for]

@@ -2,7 +2,7 @@
 
 Automatically log all sent emails, user logins, and page views. This also will log custom events from Ruby and JavaScript.
 
-Logs are stored in a single database table. A Log (one logged event) can have many children Logs, nested to any depth.
+Logs are stored in a single database table.
 
 Provides a ruby one-liner to log a message, status, user, associated object and any number of additional details.
 
@@ -72,18 +72,6 @@ Any other passed options will be serialized and stored as additional details:
 
 ```ruby
 EffectiveLogger.info 'feedback given', :user => current_user, :feedback => 'your app is great!', :rating => 'good'
-```
-
-### Sub Logs
-
-Any log can have children logs.  This is perfect for long-running tasks where there are multiple sub events:
-
-```ruby
-log = EffectiveLogger.info('importing important records')
-
-log.success('record 1 imported', :associated => @record1)
-log.error('record 2 failed to import', :associated => @record2)
-log.success('record 3 imported', :associated => @record3)
 ```
 
 ### Model
@@ -290,9 +278,6 @@ EffectiveLogger.success('some other event', 'additional', 'information', {subjec
 ```
 
 The same statuses available to ruby will be available to JavaScript.
-
-Creating child logs via JavaScript is not yet supported.
-
 
 ## Admin Screen
 

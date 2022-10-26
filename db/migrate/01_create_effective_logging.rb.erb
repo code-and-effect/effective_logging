@@ -1,7 +1,7 @@
 class CreateEffectiveLogging < ActiveRecord::Migration[4.2]
   def self.up
     create_table <%= @logs_table_name %> do |t|
-      t.integer       :parent_id
+      t.string        :status
 
       t.string        :user_type
       t.integer       :user_id
@@ -13,21 +13,23 @@ class CreateEffectiveLogging < ActiveRecord::Migration[4.2]
       t.integer       :associated_id
       t.string        :associated_to_s
 
-      t.integer       :logs_count
-
       t.text          :message
       t.text          :details
-
-      t.string        :status
 
       t.timestamps
     end
 
+    add_index <%= @logs_table_name %>, :id, order: { id: :desc }
+    add_index <%= @logs_table_name %>, :updated_at
     add_index <%= @logs_table_name %>, :user_id
-    add_index <%= @logs_table_name %>, :parent_id
-    add_index <%= @logs_table_name %>, [:associated_type, :associated_id]
-    add_index <%= @logs_table_name %>, :associated_id
+    add_index <%= @logs_table_name %>, :status
     add_index <%= @logs_table_name %>, :associated_to_s
+    add_index <%= @logs_table_name %>, [:associated_type, :associated_id]
+    add_index <%= @logs_table_name %>, [:changes_to_type, :changes_to_id]
+
+    enable_extension('pg_trgm')
+    add_index <%= @logs_table_name %>, :message, using: :gin, opclass: :gin_trgm_ops
+    add_index <%= @logs_table_name %>, :details, using: :gin, opclass: :gin_trgm_ops
   end
 
   def self.down

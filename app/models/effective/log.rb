@@ -4,16 +4,12 @@ module Effective
   class Log < ActiveRecord::Base
     self.table_name = EffectiveLogging.logs_table_name.to_s
 
-    # Self-Referencing relationship
-    belongs_to :parent, class_name: 'Effective::Log', counter_cache: true, optional: true
-    has_many :logs, class_name: 'Effective::Log', foreign_key: :parent_id
-
     belongs_to :user, polymorphic: true, optional: true
     belongs_to :changes_to, polymorphic: true, optional: true # This is the log_changes to: option
     belongs_to :associated, polymorphic: true, optional: true
 
     effective_resource do
-      logs_count          :integer  # Rails Counter Cache
+      status              :string
 
       changes_to_type     :string
       changes_to_id       :string
@@ -22,7 +18,6 @@ module Effective
       associated_id       :integer
       associated_to_s     :string
 
-      status              :string
       message             :text
       details             :text
 
@@ -48,7 +43,7 @@ module Effective
     end
 
     def log(message, status = EffectiveLogging.statuses.first, options = {})
-      EffectiveLogger.log(message, status, (options || {}).merge(parent: self))
+      EffectiveLogger.log(message, status, options)
     end
 
     def details
@@ -56,15 +51,11 @@ module Effective
     end
 
     def next_log
-      Log.order(id: :asc).where(parent_id: parent_id).where('id > ?', id).first
+      Log.order(id: :asc).where('id > ?', id).first
     end
 
     def prev_log
-      Log.order(id: :desc).where(parent_id: parent_id).where('id < ?', id).first
-    end
-
-    def child_logs_datatable
-      EffectiveLogsDatatable.new(log_id: id)
+      Log.order(id: :desc).where('id < ?', id).first
     end
 
     # Dynamically add logging methods based on the defined statuses

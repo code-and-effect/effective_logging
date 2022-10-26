@@ -2,9 +2,6 @@
   .panel-heading.card-header
     .row
       .col-md-8
-        - parents_of_log(log).each do |parent|
-          = link_to(log.message, request.fullpath.sub('/' + log.to_param, '/' + parent.to_param))
-          = ' > '
         %p= log.message.to_s.gsub("\n", '<br>').html_safe
 
       .col-md-4.text-right
@@ -31,7 +28,7 @@
         - if log.user.present?
           %p
             %strong User:
-            = (log.user.to_s.starts_with?('#<User:0x') ? (log.user.email rescue log.user) : log.user)
+            = log.user
 
         - if log.associated_id.present? && log.associated_type.present? && (log.associated.present? rescue false)
           %p
@@ -48,8 +45,3 @@
           .mt-3
             %strong= "#{key.to_s.titleize}:"
           = format_log_details_value(log, key)
-
-    - if log.logs.present?
-      %hr
-      %p This log contains #{log.logs_count} additional sub entries:
-      = render_datatable(log.child_logs_datatable)

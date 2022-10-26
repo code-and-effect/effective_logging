@@ -12,10 +12,6 @@ class EffectiveLogger
       raise ArgumentError.new('Log.log :user => ... argument must be a User object')
     end
 
-    if options[:parent].present? && !options[:parent].kind_of?(Effective::Log)
-      raise ArgumentError.new('Log.log :parent => ... argument must be an Effective::Log object')
-    end
-
     if options[:associated].present? && !options[:associated].kind_of?(ActiveRecord::Base)
       raise ArgumentError.new('Log.log :associated => ... argument must be an ActiveRecord::Base object')
     end
@@ -34,7 +30,6 @@ class EffectiveLogger
       user_id: options.delete(:user_id),
       user_type: options.delete(:user_type),
       user: options.delete(:user),
-      parent: options.delete(:parent),
       associated: options.delete(:associated),
       associated_to_s: options.delete(:associated_to_s),
       details: options
