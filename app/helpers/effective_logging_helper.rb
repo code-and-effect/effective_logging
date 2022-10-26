@@ -24,12 +24,6 @@ module EffectiveLoggingHelper
     render(partial: 'effective/logs/log', locals: { log: log })
   end
 
-  def parents_of_log(log)
-    parents = [log.parent]
-    parents << parents.last.parent while(parents.last.try(:parent_id).present?)
-    parents.compact.reverse
-  end
-
   # This is called on the Logs#show Admin page, and is intended for override by the application
   def effective_logging_object_link_to(obj, action = :show)
     if obj.kind_of?(User)
