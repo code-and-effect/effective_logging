@@ -1,4 +1,4 @@
-%h1.effective-admin-heading= @page_title
+= render 'layout' do
+  %h1.effective-admin-heading= @page_title
 
-= render_log(@log)
-
+  = render_log(@log)
