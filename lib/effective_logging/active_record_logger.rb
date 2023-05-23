@@ -3,7 +3,7 @@ module EffectiveLogging
     attr_accessor :object, :resource, :options
 
     BLANK = "''"
-    BLACKLIST = [:updated_at, :created_at, :encrypted_password, :status_steps] # Don't log changes or attributes
+    BLACKLIST = [:updated_at, :created_at, :encrypted_password, :status_steps, :wizard_steps] # Don't log changes or attributes
 
     # to, prefix, only, except
     def initialize(object, args = {})
