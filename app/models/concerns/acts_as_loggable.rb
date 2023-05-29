@@ -69,7 +69,8 @@ module ActsAsLoggable
   end
 
   def log_changes_datatable
-    EffectiveLogChangesDatatable.new(changes_to: self) if persisted?
+    # We use the changes_to_type and changes_to_id so that the bootstrap3 datatable is still aware of the resources
+    EffectiveLogChangesDatatable.new(changes_to: self, changes_to_type: self.class.name, changes_to_id: id) if persisted?
   end
 
 end
