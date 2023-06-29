@@ -20,7 +20,7 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :changes_to, class_name: 'Effective::Log'
+    has_many :logged_changes, -> { EffectiveLogging.Log.order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :changes_to
 
     log_changes_options = {
       to: @acts_as_loggable_options[:to],
