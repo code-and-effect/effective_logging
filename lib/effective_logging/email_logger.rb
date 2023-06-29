@@ -51,17 +51,13 @@ module EffectiveLogging
     private
 
     def self.log_email(message, fields, user_klass)
-      tos = Array(message.to) - [nil, '']
+      tos = (Array(message.to) + Array(message.cc)) - [nil, '']
 
       tos.each do |to|
         user = (user_klass.where(email: to.downcase).first if user_klass.present?)
+        details = fields.merge(to: to, user: user)
 
-        user_fields = fields.merge(to: to, user: user)
-        ::EffectiveLogger.email("#{message.subject} - #{tos.join(', ')}", user_fields)
-      end
-
-      if tos.blank? && (message.cc.present? || message.bcc.present?)
-        ::EffectiveLogger.email("#{message.subject} - multiple recipients", fields)
+        ::EffectiveLogger.email("#{message.subject} - #{to}", details)
       end
 
       true
