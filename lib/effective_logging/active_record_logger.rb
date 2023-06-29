@@ -43,7 +43,7 @@ module EffectiveLogging
     end
 
     def log(message, details)
-      Effective::Log.create!(
+      EffectiveLogging.Log.create!(
         changes_to: log_changes_to,
         associated: object,
         associated_to_s: (object.to_s rescue nil),

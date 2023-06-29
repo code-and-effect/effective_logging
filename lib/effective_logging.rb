@@ -6,11 +6,16 @@ module EffectiveLogging
   def self.config_keys
     [
       :logs_table_name, :layout, :additional_statuses,
+      :log_class_name,
       :active_storage_enabled, :email_enabled, :sign_in_enabled, :sign_out_enabled
     ]
   end
 
   include EffectiveGem
+
+  def self.Log
+    log_class_name&.constantize || Effective::Log
+  end
 
   def self.statuses
     @statuses ||= (

@@ -254,7 +254,7 @@ First, require the javascript in your application.js:
 and add the user permission:
 
 ```ruby
-can :create, Effective::Log
+can :create, EffectiveLogging.Log
 ```
 
 then logging an event from JavaScript is almost the same one-liner as from ruby:
@@ -290,7 +290,7 @@ link_to 'Logs', effective_logging.admin_logs_path   # /admin/logs
 But you may need to add the permission (using CanCan):
 
 ```ruby
-can :manage, Effective::Log
+can :manage, EffectiveLoggging.Log
 can :admin, :effective_logging
 ```
 

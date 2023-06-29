@@ -2,6 +2,9 @@ EffectiveLogging.setup do |config|
   # Configure Database Tables
   config.logs_table_name = :logs
 
+  # Specify Log class
+  # config.log_class_name = 'Effective::Log'
+
   # Admin Screens Layout Settings
   # config.layout = { application: 'application', admin: 'admin' }
 

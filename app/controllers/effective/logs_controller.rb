@@ -5,15 +5,17 @@ module Effective
     include Effective::CrudController
     skip_log_page_views
 
+    resource_scope -> { EffectiveLogging.Log.all }
+
     if (config = EffectiveLogging.layout)
       layout(config.kind_of?(Hash) ? config[:application] : config)
     end
 
     # This is a post from our Javascript
     def create
-      EffectiveResources.authorize!(self, :create, Effective::Log.new)
+      EffectiveResources.authorize!(self, :create, resource_scope.new)
 
-      @log = Effective::Log.new.tap do |log|
+      @log = resource_scope.new.tap do |log|
         log.message = log_params[:message]
         log.status = EffectiveLogging.statuses.find { |status| status == log_params[:status] } || 'info'
         log.user = EffectiveLogging.current_user || current_user
@@ -40,12 +42,12 @@ module Effective
 
     # This is the User index event
     def index
-      EffectiveResources.authorize!(self, :index, Effective::Log.new(user_id: current_user.id))
+      EffectiveResources.authorize!(self, :index, resource_scope.new(user: current_user, user_id: current_user.id))
       @datatable = EffectiveLogsDatatable.new(self, for: current_user.id)
     end
 
     def html_part
-      @log = Effective::Log.find(params[:id])
+      @log = resource_scope.find(params[:id])
 
       EffectiveResources.authorize!(self, :show, @log)
 

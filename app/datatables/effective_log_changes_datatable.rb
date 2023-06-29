@@ -37,7 +37,7 @@ class EffectiveLogChangesDatatable < Effective::Datatable
   # A nil attributes[:log_id] means give me all the top level log entries
   # If we set a log_id then it's for sub logs
   collection do
-    Effective::Log.logged_changes.deep
+    EffectiveLogging.Log.logged_changes.deep
       .where(changes_to_type: attributes[:changes_to_type], changes_to_id: attributes[:changes_to_id])
   end
 

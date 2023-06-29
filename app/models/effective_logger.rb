@@ -24,7 +24,7 @@ class EffectiveLogger
       options[:user_agent] ||= request.user_agent
     end
 
-    log = Effective::Log.new(
+    log = EffectiveLogging.Log.new(
       message: message,
       status: status,
       user_id: options.delete(:user_id),
