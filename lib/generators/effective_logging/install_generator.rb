@@ -20,9 +20,7 @@ module EffectiveLogging
       end
 
       def create_migration_file
-        @logs_table_name = ':' + EffectiveLogging.logs_table_name.to_s
-
-        migration_template ('../' * 3) + 'db/migrate/01_create_effective_logging.rb.erb', 'db/migrate/create_effective_logging.rb'
+        migration_template ('../' * 3) + 'db/migrate/101_create_effective_logging.rb', 'db/migrate/create_effective_logging.rb'
       end
     end
   end
