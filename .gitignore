@@ -1,6 +1,6 @@
-Gemfile.lock
 *.gem
 .bundle/
+tmp/
 log/*.log
 pkg/
 spec/dummy/db/*.sqlite3
