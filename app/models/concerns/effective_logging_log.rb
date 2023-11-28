@@ -40,7 +40,11 @@ module EffectiveLoggingLog
       timestamps
     end
 
-    serialize :details, Hash
+    if EffectiveResources.serialize_with_coder?
+      serialize :details, type: Hash, coder: YAML
+    else
+      serialize :details, Hash
+    end
 
     validates :message, presence: true
     validates :status, presence: true
