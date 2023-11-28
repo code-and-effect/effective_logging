@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    effective_logging (4.0.0)
+    effective_logging (4.1.0)
       coffee-rails
       devise
       effective_datatables
@@ -126,8 +126,9 @@ GEM
     effective_developer (0.7.6)
       effective_resources
       rails (>= 3.2.0)
-    effective_resources (2.8.7)
-      rails (>= 4.0.0)
+    effective_resources (2.18.0)
+      rails
+      sprockets-rails
     effective_test_bot (1.4.0)
       capybara
       effective_resources
