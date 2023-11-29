@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    effective_logging (4.1.0)
+    effective_logging (4.1.1)
       coffee-rails
       devise
       effective_datatables
