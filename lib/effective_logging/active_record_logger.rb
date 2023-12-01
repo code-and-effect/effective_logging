@@ -69,7 +69,7 @@ module EffectiveLogging
     end
 
     def resource_attributes # effective_resources gem
-      resource.instance_attributes(only: options[:only], except: options[:except])
+      resource.instance_attributes(only: options[:only], except: options[:except], associations: false)
     end
 
     def resource_changes # effective_resources gem
