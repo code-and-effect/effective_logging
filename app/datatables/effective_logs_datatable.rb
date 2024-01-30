@@ -44,24 +44,19 @@ class EffectiveLogsDatatable < Effective::Datatable
   collection do
     scope = EffectiveLogging.Log.deep.all
 
-    # Older syntax, pass by integer
-    if attributes[:for]
-      user_ids = Array(attributes[:for])
-      scope = scope.where('user_id IN (?) OR (associated_id IN (?) AND associated_type = ?)', user_ids, user_ids, 'User')
-    end
-
     # Newer syntax, pass by object
     if attributes[:for_id] && attributes[:for_type]
       scope = scope.where(associated_id: attributes[:for_id], associated_type: attributes[:for_type])
         .or(scope.where(changes_to_id: attributes[:for_id], changes_to_type: attributes[:for_type]))
         .or(scope.where(user_id: attributes[:for_id], user_type: attributes[:for_type]))
+    elsif attributes[:for] # Older syntax, pass by integer
+      user_ids = Array(attributes[:for])
+      scope = scope.where('user_id IN (?) OR (associated_id IN (?) AND associated_type = ?)', user_ids, user_ids, 'User')
     end
 
     if attributes[:associated_id] && attributes[:associated_type]
       scope = scope.where(associated_id: attributes[:associated_id], associated_type: attributes[:associated_type])
-    end
-
-    if attributes[:associated]
+    elsif attributes[:associated]
       scope = scope.where(associated: attributes[:associated])
     end
 
