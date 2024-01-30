@@ -318,8 +318,7 @@ We can also use a similar method to create a datatable of logs for just one user
 When initialized with :for, the logs are scoped to any log where this id matches the User or Associated column.
 
 ```ruby
-EffectiveLogsDatatable.new(for: @user.id)
-EffectiveLogsDatatable.new(for: [1, 2, 3])  # Users with ID 1, 2 and 3
+EffectiveLogsDatatable.new(for: @user)
 ```
 
 ### Upgrade from 2.0
