@@ -7,7 +7,8 @@ require "rails/all"
 Bundler.require(*Rails.groups)
 
 require 'devise'
-require "effective_test_bot"
+require 'effective_logging'
+require 'effective_test_bot'
 
 module Dummy
   class Application < Rails::Application
