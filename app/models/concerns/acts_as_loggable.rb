@@ -20,7 +20,7 @@ module ActsAsLoggable
   end
 
   included do
-    has_many :logged_changes, -> { EffectiveLogging.Log.order(:id).where(status: EffectiveLogging.log_changes_status) }, as: :changes_to
+    has_many :logged_changes, -> { where(status: EffectiveLogging.log_changes_status).order(:id) }, as: :changes_to, class_name: 'Effective::Log'
 
     log_changes_options = {
       to: @acts_as_loggable_options[:to],
@@ -35,15 +35,15 @@ module ActsAsLoggable
 
     self.send(:define_method, :log_changes_options) { log_changes_options }
 
-    after_create(unless: -> { EffectiveLogging.supressed? }) do
+    after_create(if: -> { log_changes? }, unless: -> { EffectiveLogging.supressed? }) do
       ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).created!
     end
 
-    after_destroy(unless: -> { EffectiveLogging.supressed? }) do
+    after_destroy(if: -> { log_changes? }, unless: -> { EffectiveLogging.supressed? }) do
       ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).destroyed!
     end
 
-    after_update(unless: -> { EffectiveLogging.supressed? }) do
+    after_update(if: -> { log_changes? }, unless: -> { EffectiveLogging.supressed? }) do
       ::EffectiveLogging::ActiveRecordLogger.new(self, log_changes_options).updated!
     end
   end
@@ -53,6 +53,11 @@ module ActsAsLoggable
   end
 
   # Regular instance methods
+
+  # Disable logging of changes for this resource
+  def log_changes?
+    true # Can be overridden to suppress logging
+  end
 
   # Format the title of this attribute. Return nil to use the default attribute.titleize
   def log_changes_formatted_attribute(attribute)
