@@ -11,6 +11,7 @@ EffectiveLogging::Engine.routes.draw do
 
   namespace :admin do
     resources :logs, only: [:index, :show]
+    resources :tracks, only: :index
   end
 
 end

@@ -30,5 +30,22 @@ class CreateEffectiveLogging < ActiveRecord::Migration[6.0]
     enable_extension('pg_trgm')
     add_index :logs, :message, using: :gin, opclass: :gin_trgm_ops
     add_index :logs, :details, using: :gin, opclass: :gin_trgm_ops
+
+    create_table :tracks do |t|
+      t.string        :owner_type
+      t.integer       :owner_id
+
+      t.string        :user_type
+      t.integer       :user_id
+
+      t.string        :action
+      t.string        :title
+      t.text          :details
+
+      t.timestamps
+    end
+
+    add_index :tracks, :owner_id
+    add_index :tracks, :user_id
   end
 end
