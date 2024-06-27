@@ -28,6 +28,7 @@ module EffectiveLogging
       app.config.to_prepare do
         ActiveSupport.on_load :active_record do
           ActiveRecord::Base.extend(ActsAsLoggable::Base)
+          ActiveRecord::Base.extend(ActsAsTrackable::Base)
           ActiveRecord::Base.extend(EffectiveLoggingLog::Base)
         end
       end

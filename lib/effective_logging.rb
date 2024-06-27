@@ -5,7 +5,7 @@ require 'effective_logging/version'
 module EffectiveLogging
   def self.config_keys
     [
-      :logs_table_name, :layout, :additional_statuses,
+      :logs_table_name, :tracks_table_name, :layout, :additional_statuses,
       :log_class_name,
       :active_storage_enabled, :email_enabled, :sign_in_enabled, :sign_out_enabled
     ]
