@@ -11,8 +11,7 @@ module EffectiveLogging
       # Add a log header to your mailer to pass some objects or additional things to EffectiveLogger
       # mail(to: 'admin@example.com', subject: @post.title, log: @post)
       log = if message.header['log'].present?
-        message.header['log'].instance_variable_get(:@unparsed_value) ||
-        message.header['log'].instance_variable_get(:@value)
+        message.header['log'].instance_variable_get(:@unparsed_value) || message.header['log'].instance_variable_get(:@value)
       end
 
       # If we have a logged object, associate it
@@ -37,6 +36,8 @@ module EffectiveLogging
       # Parse the content for logging
       parts = (message.body.try(:parts) || []).map { |part| [part, (part.parts if part.respond_to?(:parts))] }.flatten
       body = parts.find { |part| part.content_type.to_s.downcase.include?('text/html') } || message.body
+      body = (body.try(:body) || body)
+
       fields[:email] = "#{message.header}<hr>#{body}"
 
       # Find the user to associate it with
