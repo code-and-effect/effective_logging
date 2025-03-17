@@ -46,7 +46,7 @@ module EffectiveLogging
       EffectiveLogging.Log.create!(
         changes_to: log_changes_to,
         associated: object,
-        associated_to_s: (object.to_s rescue nil),
+        associated_to_s: (object.log_changes_to_s rescue nil),
         user: EffectiveLogging.current_user,
         status: EffectiveLogging.log_changes_status,
         message: [options[:prefix].presence, message].compact.join,
