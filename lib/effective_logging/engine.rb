@@ -44,7 +44,7 @@ module EffectiveLogging
       end
     end
 
-    # Register the log_page_views concern so that it can be called in ActionController or elsewhere
+    # Add log_changes to ActiveStorage::Attachment
     initializer 'effective_logging.active_storage_attachment' do |app|
       if defined?(ActiveStorage)
         app.config.to_prepare do
