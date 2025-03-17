@@ -59,6 +59,14 @@ module ActsAsLoggable
     true # Can be overridden to suppress logging
   end
 
+  def log_changes_to_s
+    if self.class.name == 'ActiveStorage::Attachment'
+      "#{name} - #{filename}"
+    else
+      to_s
+    end
+  end
+
   # Format the title of this attribute. Return nil to use the default attribute.titleize
   def log_changes_formatted_attribute(attribute)
     'Roles' if attribute == :roles_mask && defined?(EffectiveRoles) && respond_to?(:roles)
