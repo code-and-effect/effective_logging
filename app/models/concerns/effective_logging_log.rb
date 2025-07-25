@@ -53,7 +53,7 @@ module EffectiveLoggingLog
       errors.add(:status, "is not included") unless EffectiveLogging.statuses.include?(status)
     end
 
-    scope :deep, -> { includes(:user, :associated, :changes_to) }
+    scope :deep, -> { includes(:user) }
     scope :sorted, -> { order(:id) }
     scope :logged_changes, -> { where(status: EffectiveLogging.log_changes_status) }
     scope :changes, -> { where(status: EffectiveLogging.log_changes_status) }
