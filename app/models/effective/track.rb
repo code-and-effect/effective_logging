@@ -9,7 +9,7 @@ module Effective
     # Present when the user is signed in
     belongs_to :user, polymorphic: true, optional: true
 
-    ACTIONS = ['view']
+    ACTIONS = ['view', 'click']
 
     effective_resource do
       action          :string
