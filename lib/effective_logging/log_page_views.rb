@@ -42,14 +42,15 @@ module EffectiveLogging
         user = EffectiveLogging.current_user || (current_user if respond_to?(:current_user))
 
         if self.class.log_page_views_opts[:details] == false
-          ::EffectiveLogger.view("#{request.request_method} #{request.path}", user: user)
+          ::EffectiveLogger.view("#{request.request_method} #{request.path}", user: user, associated: try(:resource))
         else
           ::EffectiveLogger.view(
             "#{request.request_method} #{request.path}",
             user: user,
             format: (request.format.to_s == 'text/html' ? nil : request.format.to_s),
             params: request.filtered_parameters.reject { |k, v| (k == 'controller' || k == 'action') },
-            request: request
+            request: request,
+            associated: try(:resource)
           )
         end
       end

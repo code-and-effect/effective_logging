@@ -38,8 +38,21 @@ module EffectiveLogging
     initializer 'effective_logging.active_storage' do |app|
       if EffectiveLogging.active_storage_enabled == true && defined?(ActiveStorage)
         app.config.to_prepare do
-          ActiveStorage::DiskController.include(EffectiveLogging::ActiveStorageLogger)
-          ActiveStorage::DiskController.class_eval { after_action(:track_downloads, only: :show) }
+          ActiveStorage::BaseController.class_eval do
+            include ActiveStorageLogger
+          end
+
+          ActiveStorage::DiskController.class_eval do
+            after_action :track_active_storage_download, only: [:show]
+          end
+
+          ActiveStorage::Blobs::RedirectController.class_eval do
+            after_action :track_active_storage_redirect, only: [:show]
+          end
+
+          ActiveStorage::Representations::RedirectController.class_eval do
+            after_action :track_active_storage_redirect, only: [:show]
+          end
         end
       end
     end

@@ -26,7 +26,13 @@ class EffectiveLogsDatatable < Effective::Datatable
 
     col :associated_type, visible: false, sort: false
     col :associated_id, visible: false, label: 'Associated Id', sort: false
-    col :associated_to_s, label: 'Associated'
+    col :associated_to_s, label: 'Item'
+
+    col(:associated, visible: false).search do |collection, term, column, sql_column|
+      collection.where("associated_to_s ILIKE ?", "%#{term}%")
+    end.sort do |collection, direction, column, sql_column|
+      collection.order(associated_to_s: direction)
+    end
 
     col :message, sort: false do |log|
       (log.message || '').gsub("\n", '<br>')

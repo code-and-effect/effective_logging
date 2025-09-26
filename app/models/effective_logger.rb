@@ -17,22 +17,24 @@ class EffectiveLogger
     end
 
     if options[:request].present? && options[:request].respond_to?(:referrer)
-      request = options.delete(:request)
+      request = options[:request]
 
       options[:ip] ||= request.ip
       options[:referrer] ||= request.referrer
       options[:user_agent] ||= request.user_agent
     end
 
+    details = options.except(:request, :user_id, :user_type, :user, :associated_id, :associated_type, :associated, :associated_to_s)
+
     log = EffectiveLogging.Log.new(
       message: message,
       status: status,
-      user_id: options.delete(:user_id),
-      user_type: options.delete(:user_type),
-      user: options.delete(:user),
-      associated: options.delete(:associated),
-      associated_to_s: options.delete(:associated_to_s),
-      details: options
+      user_id: options[:user_id],
+      user_type: options[:user_type],
+      user: options[:user],
+      associated: options[:associated],
+      associated_to_s: options[:associated_to_s],
+      details: details
     )
 
     if log.associated.present?

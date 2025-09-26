@@ -17,6 +17,20 @@ EffectiveLogging.setup do |config|
   # Log all active storage downloads
   config.active_storage_enabled = true
 
+  # Only log active storage downloads for these attachment record types
+  # config.active_storage_only = []
+
+  # Don't log active storage downloads for these attachment record types
+  # config.active_storage_except = [
+  #   'ActionText::RichText'
+  #   'Effective::BannerAd',
+  #   'Effective::CarouselItem', 
+  #   'Effective::PageBanner', 
+  #   'Effective::PageSection', 
+  #   'Effective::Permalink',
+  #   'Effective::Post',
+  # ]
+
   # Log all sent emails
   config.email_enabled = true
 

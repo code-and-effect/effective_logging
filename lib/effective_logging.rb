@@ -7,7 +7,8 @@ module EffectiveLogging
     [
       :logs_table_name, :tracks_table_name, :layout, :additional_statuses,
       :log_class_name,
-      :active_storage_enabled, :email_enabled, :sign_in_enabled, :sign_out_enabled
+      :active_storage_enabled, :active_storage_only, :active_storage_except, 
+      :email_enabled, :sign_in_enabled, :sign_out_enabled
     ]
   end
 
@@ -64,6 +65,19 @@ module EffectiveLogging
 
   def self.supressed?
     Thread.current[:effective_logging_supressed] == true
+  end
+
+  # For ActiveStorageLogger
+  def self.active_storage_onlies
+    onlies = Array(active_storage_only) - [nil, '', ' ']
+    raise("effective_logging.active_storage_only should be an Array of Strings") if onlies.present? && !onlies.all? { |type| type.kind_of?(String) }
+    onlies
+  end
+
+  def self.active_storage_excepts
+    excepts = Array(active_storage_except) - [nil, '', ' ']
+    raise("effective_logging.active_storage_except should be an Array of Strings") if excepts.present? && !excepts.all? { |type| type.kind_of?(String) }
+    excepts
   end
 
 end
