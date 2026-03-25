@@ -1,47 +1,48 @@
-.panel.panel-default.card
-  .panel-heading.card-header
-    .row
-      .col-md-8
-        %p= log.message.to_s.gsub("\n", '<br>').html_safe
+- content_for :resource_buttons do
+  - prev_log = log.prev_log
+  - next_log = log.next_log
 
-      .col-md-4.text-right
-        - prev_log = log.prev_log
-        - next_log = log.next_log
+  - if prev_log.present?
+    = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + prev_log.to_param), class: 'btn btn-primary'
 
-        - if prev_log.present?
-          = link_to 'Prev', request.fullpath.sub('/' + log.to_param, '/' + prev_log.to_param), class: 'btn btn-primary'
+  - if next_log.present?
+    = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + next_log.to_param), class: 'btn btn-primary'
 
-        - if next_log.present?
-          = link_to 'Next', request.fullpath.sub('/' + log.to_param, '/' + next_log.to_param), class: 'btn btn-primary'
+.card.card-effective-logging
+  .card-body
+    %p= log.message.to_s.gsub("\n", '<br>').html_safe
 
-  .panel-body.card-body
-    .row
-      .col-md-6
-        %p
+    %hr.my-4
+
+    %h4.card-title Details
+    %table.table.table-sm.table-striped
+      %tr
+        %th
           - status_class = bootstrap_class_for_status(log.status)
           %span{class: (defined?(EffectiveBootstrap) ? "badge badge-#{status_class}" : "label label-#{status_class}")}= log.status
-
+        %td
           = log.created_at.strftime("%F %H:%M:%S")
           = '(' + time_ago_in_words(log.created_at) + ' ago)'
 
-      .col-md-6
         - if log.user.present?
-          %p
-            %strong User:
-            = log.user
+          %tr
+            %th
+              User
+            %td
+              = log.user
 
         - if log.associated_id.present? && log.associated_type.present? && (log.associated.present? rescue false)
-          %p
-            %strong Associated:
-            - if log.associated.to_s.starts_with?('#<')
-              = "#{log.associated.class.name} ##{log.associated.to_param}"
-            - else
-              = log.associated
+          %tr
+            %th Associated
+            %td
+              - if log.associated.to_s.starts_with?('#<')
+                = log.associated.class.name
+                = log.associated.to_param
+              - else
+                = log.associated
 
     - log.details.each do |key, value|
       - next unless value.present?
-      .row
-        .col-md-12
-          .mt-3
-            %strong= "#{key.to_s.titleize}:"
-          = format_log_details_value(log, key)
+      %hr.my-4
+      %h5.card-title= key.to_s.titleize
+      = format_log_details_value(log, key)
