@@ -15,7 +15,7 @@ module EffectiveLogging
   include EffectiveGem
 
   def self.Log
-    log_class_name&.constantize || Effective::Log
+    klass(:log)
   end
 
   def self.statuses
